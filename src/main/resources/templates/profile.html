@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль</title>
+</head>
+<body>
+    <h1>Список автомобилей</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Марка</th>
+                <th>Модель</th>
+                <th>Год выпуска</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="car : ${listCars}">
+                <td th:text="${car.make}"></td>
+                <td th:text="${car.model}"></td>
+                <td th:text="${car.year}"></td>
+            </tr>
+        </tbody>
+    </table>
+    <h2>Добавить автомобиль</h2>
+    <form action="#" th:action="@{/profile/new-car}" th:object="${car}" method="POST">
+        <input type="text" th:field="*{make}" placeholder="Введите производителя">
+        <input type="text" th:field="*{model}" placeholder="Введите модель">
+        <input type="text" th:field="*{year}" placeholder="Введите год выпуска">
+        <button type="submit">Добавить</button>
+    </form>
+</body>
+</html>

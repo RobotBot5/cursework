@@ -6,6 +6,8 @@ import com.rtumirea.KazakovIG.cursework.services.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -27,5 +29,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean isUserExists(String phoneNumber) {
         return userRepository.findByPhoneNumber(phoneNumber).isPresent();
+    }
+
+    @Override
+    public Optional<UserEntity> findByPhoneNumber(String phoneNumber) {
+        return userRepository.findByPhoneNumber(phoneNumber);
     }
 }
