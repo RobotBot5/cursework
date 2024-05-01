@@ -4,16 +4,21 @@ import com.rtumirea.KazakovIG.cursework.domain.dto.UserDto;
 import com.rtumirea.KazakovIG.cursework.domain.entities.UserEntity;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
 import com.rtumirea.KazakovIG.cursework.services.UserService;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.java.Log;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@Controller
+@Log
 public class UserController {
 
     private UserService userService;
 
     private Mapper<UserEntity, UserDto> userMapper;
+
 
     public UserController(UserService userService, Mapper<UserEntity, UserDto> userMapper) {
         this.userService = userService;
@@ -21,9 +26,15 @@ public class UserController {
     }
 
     @PostMapping(path = "/new-user")
-    public String addUser(@RequestBody UserDto userDto) {
+    public String addUser(@ModelAttribute("user") UserDto userDto, HttpServletRequest request) {
+        userDto.setRoles("ROLE_CLIENT");
         UserEntity userEntity = userMapper.mapFrom(userDto);
         userService.addUser(userEntity);
-        return "User is saved";
+        try {
+            request.login(userDto.getPhoneNumber(), userDto.getPassword());
+        } catch (ServletException e) {
+            log.warning("Error while login " + e);
+        }
+        return "redirect:/services";
     }
 }

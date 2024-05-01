@@ -3,7 +3,9 @@ package com.rtumirea.KazakovIG.cursework.config;
 import com.rtumirea.KazakovIG.cursework.services.impl.MyUserDetailService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,9 +31,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/new-user").permitAll()
-                        .requestMatchers("/**").permitAll())
-                .formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/register", "/new-user").permitAll()
+                        .anyRequest().authenticated())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .permitAll())
                 .build();
     }
 
@@ -47,5 +51,14 @@ public class SecurityConfig {
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
+
+//    @Bean
+//    public AuthenticationManager authenticationManager() {
+//        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+//        authenticationProvider.setUserDetailsService(userDetailsService());
+//        authenticationProvider.setPasswordEncoder(passwordEncoder());
+//
+//        return new ProviderManager(authenticationProvider);
+//    }
 
 }
