@@ -10,6 +10,7 @@
     <input type="text" th:field="*{phoneNumber}" placeholder="Введите Ваш номер телефона">
     <input type="text" th:field="*{name}" placeholder="Введите Ваше имя">
     <input type="text" th:field="*{password}" placeholder="Введите пароль">
+    <div th:if="${error}" style="color: red;" th:text="${error}"></div>
     <button type="submit">Зарегистрироваться</button>
 </form>
 </body>
