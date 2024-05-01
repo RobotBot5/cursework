@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Services List</title>
+</head>
+<body>
+    <div align="center">
+        <h1>Список сервисов</h1>
+        <table>
+            <thead>
+            <tr>
+                <th>Название услуги</th>
+                <th>Описание услуги</th>
+                <th>Цена услуги</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="service : ${listServices}">
+                <td th:text="${service.name}"></td>
+                <td th:text="${service.description}"></td>
+                <td th:text="${service.price}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
