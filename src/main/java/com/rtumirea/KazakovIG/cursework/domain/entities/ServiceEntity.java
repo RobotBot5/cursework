@@ -1,5 +1,6 @@
 package com.rtumirea.KazakovIG.cursework.domain.entities;
 
+import com.rtumirea.KazakovIG.cursework.domain.enums.ServiceType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,12 +16,14 @@ import lombok.NoArgsConstructor;
 public class ServiceEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "service_id_seq")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @JoinColumn(name = "service_type")
+    private ServiceType serviceType;
 
-    private String description;
+    private String name;
 
     private Integer price;
 

@@ -1,5 +1,6 @@
 package com.rtumirea.KazakovIG.cursework.domain.dto;
 
+import com.rtumirea.KazakovIG.cursework.domain.enums.ServiceType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,9 +14,9 @@ public class ServiceDto {
 
     private Long id;
 
-    private String name;
+    private ServiceType serviceType;
 
-    private String description;
+    private String name;
 
     private Integer price;
 

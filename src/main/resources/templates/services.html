@@ -5,20 +5,18 @@
     <title>Services List</title>
 </head>
 <body>
-    <div align="center">
-        <h1>Список сервисов</h1>
+    <div align="center" th:each="entry : ${servicesByType}">
+        <h2 th:text="${serviceTypeNames[__${entry.key}__]}"></h2>
         <table>
             <thead>
             <tr>
                 <th>Название услуги</th>
-                <th>Описание услуги</th>
                 <th>Цена услуги</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="service : ${listServices}">
+            <tr th:each="service : ${entry.value}">
                 <td th:text="${service.name}"></td>
-                <td th:text="${service.description}"></td>
                 <td th:text="${service.price}"></td>
             </tr>
             </tbody>
