@@ -1,8 +1,10 @@
 package com.rtumirea.KazakovIG.cursework.controllers;
 
 import com.rtumirea.KazakovIG.cursework.domain.dto.CarDto;
+import com.rtumirea.KazakovIG.cursework.domain.dto.UserDto;
 import com.rtumirea.KazakovIG.cursework.domain.entities.CarEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.ServiceEntity;
+import com.rtumirea.KazakovIG.cursework.domain.entities.UserEntity;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
 import com.rtumirea.KazakovIG.cursework.mappers.impl.CarMapper;
 import com.rtumirea.KazakovIG.cursework.services.CarService;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -30,10 +33,13 @@ public class CarController {
 
     private Mapper<CarEntity, CarDto> carMapper;
 
-    public CarController(CarService carService, Mapper<CarEntity, CarDto> carMapper, UserService userService) {
+    private Mapper<UserEntity, UserDto> userMapper;
+
+    public CarController(CarService carService, Mapper<CarEntity, CarDto> carMapper, UserService userService, Mapper<UserEntity, UserDto> userMapper) {
         this.carService = carService;
         this.carMapper = carMapper;
         this.userService = userService;
+        this.userMapper = userMapper;
     }
 
     @GetMapping(path = "/profile")
@@ -44,6 +50,12 @@ public class CarController {
                 .map(carMapper::mapTo)
                 .collect(Collectors.toList()));
         model.addAttribute("car", carDto);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userPhoneNumber = authentication.getName();
+        Optional<UserEntity> userEntity = userService.findByPhoneNumber(userPhoneNumber);
+        Optional<UserDto> userDto = userEntity.map(userMapper::mapTo);
+        model.addAttribute("user", userDto.get());
 
         return "profile";
     }

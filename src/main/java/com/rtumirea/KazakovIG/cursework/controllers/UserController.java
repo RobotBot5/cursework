@@ -41,6 +41,6 @@ public class UserController {
         } catch (ServletException e) {
             log.warning("Error while login " + e);
         }
-        return "redirect:/services";
+        return "redirect:/profile";
     }
 }
