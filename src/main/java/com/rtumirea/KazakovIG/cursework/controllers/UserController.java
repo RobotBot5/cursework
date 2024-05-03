@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @Log
@@ -27,10 +28,10 @@ public class UserController {
     }
 
     @PostMapping(path = "/new-user")
-    public String addUser(@ModelAttribute("user") UserDto userDto, HttpServletRequest request, Model model) {
+    public String addUser(@ModelAttribute("user") UserDto userDto, HttpServletRequest request, RedirectAttributes redirectAttributes) {
         if(userService.isUserExists(userDto.getPhoneNumber())) {
-            model.addAttribute("error", "Номер телефона уже зарегистрирован");
-            return "register";
+            redirectAttributes.addFlashAttribute("error", "Номер телефона уже зарегистрирован");
+            return "redirect:/register";
         }
 
         userDto.setRoles("ROLE_CLIENT");

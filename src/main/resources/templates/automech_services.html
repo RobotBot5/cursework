@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Services List</title>
+</head>
+<body>
+<form action="#" th:action="@{/automech_services/new-service}" th:object="${service}" method="POST">
+    <select th:field="*{serviceType}">
+        <option th:each="type : ${T(com.rtumirea.KazakovIG.cursework.domain.enums.ServiceType).values()}"
+                th:value="${type}" th:text="${serviceTypeNames[__${type}__]}"></option>
+    </select>
+    <input type="text" th:field="*{name}" placeholder="Введите название услуги">
+    <input type="number" th:field="*{price}" placeholder="Введите цену услуги">
+    <div th:if="${error}" style="color: red;" th:text="${error}"></div>
+    <button type="submit">Добавить услугу</button>
+</form>
+<div align="center" th:each="entry : ${servicesByType}">
+    <h2 th:text="${serviceTypeNames[__${entry.key}__]}"></h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Название услуги</th>
+            <th>Цена услуги</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="service : ${entry.value}">
+            <td th:text="${service.name}"></td>
+            <td th:text="${service.price}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

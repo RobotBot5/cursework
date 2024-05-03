@@ -1,19 +1,18 @@
 package com.rtumirea.KazakovIG.cursework.controllers;
 
 import com.rtumirea.KazakovIG.cursework.domain.dto.ServiceDto;
-import com.rtumirea.KazakovIG.cursework.domain.dto.UserDto;
 import com.rtumirea.KazakovIG.cursework.domain.entities.ServiceEntity;
 import com.rtumirea.KazakovIG.cursework.domain.enums.ServiceType;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
 import com.rtumirea.KazakovIG.cursework.services.ServiceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,25 +20,27 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
-public class ServiceController {
+public class ClientServiceController {
 
     private ServiceService serviceService;
 
     private Mapper<ServiceEntity, ServiceDto> serviceMapper;
 
-    public ServiceController(ServiceService serviceService, Mapper<ServiceEntity, ServiceDto> serviceMapper) {
+    public ClientServiceController(ServiceService serviceService, Mapper<ServiceEntity, ServiceDto> serviceMapper) {
         this.serviceService = serviceService;
         this.serviceMapper = serviceMapper;
     }
 
-    @PostMapping(path = "/services")
+    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
+    @PostMapping(path = "/client_services")
     public ResponseEntity<ServiceDto> createService(@RequestBody ServiceDto serviceDto) {
         ServiceEntity serviceEntity = serviceMapper.mapFrom(serviceDto);
         ServiceEntity savedServiceEntity = serviceService.save(serviceEntity);
         return new ResponseEntity<>(serviceMapper.mapTo(savedServiceEntity), HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/services")
+    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
+    @GetMapping(path = "/client_services")
     public String listServices(Model model) {
         List<ServiceEntity> serviceEntities = serviceService.findAll();
         Map<ServiceType, List<ServiceEntity>> servicesByType = serviceEntities.stream()
@@ -47,7 +48,7 @@ public class ServiceController {
         model.addAttribute("servicesByType", servicesByType);
         Map<String, String> serviceTypeNames = getServiceTypeNames();
         model.addAttribute("serviceTypeNames", serviceTypeNames);
-        return "services";
+        return "client_services";
     }
 
     public Map<String, String> getServiceTypeNames() {

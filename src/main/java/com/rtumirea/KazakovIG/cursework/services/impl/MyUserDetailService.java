@@ -22,11 +22,6 @@ public class MyUserDetailService implements UserDetailsService {
     @Autowired
     private UserMapper userMapper;
 
-//    public MyUserDetailService(UserRepository userRepository, UserMapper userMapper) {
-//        this.userRepository = userRepository;
-//        this.userMapper = userMapper;
-//    }
-
     @Override
     public UserDetails loadUserByUsername(String phoneNumber) throws UsernameNotFoundException {
         Optional<UserEntity> userEntity = userRepository.findByPhoneNumber(phoneNumber);

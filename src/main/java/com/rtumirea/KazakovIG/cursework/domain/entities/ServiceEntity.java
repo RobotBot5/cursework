@@ -23,6 +23,7 @@ public class ServiceEntity {
     @JoinColumn(name = "service_type")
     private ServiceType serviceType;
 
+    @Column(unique = true)
     private String name;
 
     private Integer price;

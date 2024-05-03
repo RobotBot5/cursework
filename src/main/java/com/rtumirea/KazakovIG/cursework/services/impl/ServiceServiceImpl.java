@@ -31,4 +31,9 @@ public class ServiceServiceImpl implements ServiceService {
                 false)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public boolean isServiceNameExists(String name) {
+        return serviceRepository.findByName(name).isPresent();
+    }
 }

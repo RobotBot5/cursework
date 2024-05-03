@@ -10,6 +10,7 @@ import com.rtumirea.KazakovIG.cursework.mappers.impl.CarMapper;
 import com.rtumirea.KazakovIG.cursework.services.CarService;
 import com.rtumirea.KazakovIG.cursework.services.UserService;
 import lombok.extern.java.Log;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -42,6 +43,7 @@ public class CarController {
         this.userMapper = userMapper;
     }
 
+    @PreAuthorize("hasAuthority('ROLE_CLIENT')")
     @GetMapping(path = "/profile")
     public String listCars(Model model) {
         List<CarEntity> carEntities = carService.findCurrentUserCars();
@@ -60,6 +62,7 @@ public class CarController {
         return "profile";
     }
 
+    @PreAuthorize("hasAuthority('ROLE_CLIENT')")
     @PostMapping(path = "/profile/new-car")
     public String addCar(@ModelAttribute("car") CarDto carDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

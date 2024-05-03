@@ -8,4 +8,6 @@ public interface ServiceService {
     ServiceEntity save(ServiceEntity serviceEntity);
 
     List<ServiceEntity> findAll();
+
+    boolean isServiceNameExists(String name);
 }
