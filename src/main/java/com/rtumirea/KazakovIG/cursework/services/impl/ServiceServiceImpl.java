@@ -36,4 +36,9 @@ public class ServiceServiceImpl implements ServiceService {
     public boolean isServiceNameExists(String name) {
         return serviceRepository.findByName(name).isPresent();
     }
+
+    @Override
+    public void delete(String name) {
+        serviceRepository.delete(serviceRepository.findByName(name).get());
+    }
 }

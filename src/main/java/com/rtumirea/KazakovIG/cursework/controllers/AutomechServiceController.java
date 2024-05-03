@@ -5,11 +5,10 @@ import com.rtumirea.KazakovIG.cursework.domain.entities.ServiceEntity;
 import com.rtumirea.KazakovIG.cursework.domain.enums.ServiceType;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
 import com.rtumirea.KazakovIG.cursework.services.ServiceService;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
@@ -69,6 +68,12 @@ public class AutomechServiceController {
 
         ServiceEntity serviceEntity = serviceMapper.mapFrom(serviceDto);
         serviceService.save(serviceEntity);
+        return "redirect:/automech_services";
+    }
+
+    @PostMapping(path = "/automech_services/delete-service")
+    public String deleteService(@RequestParam("deletable_service_name") String deletable_service_name) {
+        serviceService.delete(deletable_service_name);
         return "redirect:/automech_services";
     }
 }

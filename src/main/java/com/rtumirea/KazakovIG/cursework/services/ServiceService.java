@@ -10,4 +10,6 @@ public interface ServiceService {
     List<ServiceEntity> findAll();
 
     boolean isServiceNameExists(String name);
+
+    void delete(String name);
 }

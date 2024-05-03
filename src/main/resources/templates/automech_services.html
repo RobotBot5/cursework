@@ -15,6 +15,20 @@
     <div th:if="${error}" style="color: red;" th:text="${error}"></div>
     <button type="submit">Добавить услугу</button>
 </form>
+
+<form action="#" th:action="@{/automech_services/delete-service}" method="POST">
+    <select name="deletable_service_name">
+        <option disabled selected>Выберите услугу</option>
+        <th:block th:each="entry : ${servicesByType}">
+            <option disabled th:text="'--' + ${serviceTypeNames[__${entry.key}__]} + '--'"></option>
+            <th:block th:each="service : ${entry.value}">
+                <option th:value="${service.name}" th:text="${service.name}"></option>
+            </th:block>
+        </th:block>
+    </select>
+    <button type="submit">Удалить сервис</button>
+</form>
+
 <div align="center" th:each="entry : ${servicesByType}">
     <h2 th:text="${serviceTypeNames[__${entry.key}__]}"></h2>
     <table>
