@@ -6,6 +6,7 @@ import com.rtumirea.KazakovIG.cursework.domain.enums.ServiceType;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
 import com.rtumirea.KazakovIG.cursework.services.ServiceService;
 import lombok.extern.java.Log;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,7 @@ public class AutomechServiceController {
         this.serviceMapper = serviceMapper;
     }
 
+    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
     @GetMapping(path = "/automech_services")
     public String listServices(Model model) {
         List<ServiceEntity> serviceEntities = serviceService.findAll();
@@ -58,6 +60,7 @@ public class AutomechServiceController {
         return serviceTypeNames;
     }
 
+    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
     @PostMapping(path = "/automech_services/new-service")
     public String createService(@ModelAttribute("service") ServiceDto serviceDto, RedirectAttributes redirectAttributes) {
 
@@ -71,6 +74,7 @@ public class AutomechServiceController {
         return "redirect:/automech_services";
     }
 
+    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
     @PostMapping(path = "/automech_services/delete-service")
     public String deleteService(@RequestParam("deletable_service_name") String deletable_service_name) {
         serviceService.delete(deletable_service_name);

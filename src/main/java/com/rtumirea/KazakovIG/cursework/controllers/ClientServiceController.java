@@ -31,15 +31,7 @@ public class ClientServiceController {
         this.serviceMapper = serviceMapper;
     }
 
-    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
-    @PostMapping(path = "/client_services")
-    public ResponseEntity<ServiceDto> createService(@RequestBody ServiceDto serviceDto) {
-        ServiceEntity serviceEntity = serviceMapper.mapFrom(serviceDto);
-        ServiceEntity savedServiceEntity = serviceService.save(serviceEntity);
-        return new ResponseEntity<>(serviceMapper.mapTo(savedServiceEntity), HttpStatus.CREATED);
-    }
-
-    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
+    @PreAuthorize("hasAuthority('ROLE_CLIENT')")
     @GetMapping(path = "/client_services")
     public String listServices(Model model) {
         List<ServiceEntity> serviceEntities = serviceService.findAll();
