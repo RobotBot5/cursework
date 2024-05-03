@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
+@Log
 public class AutomechServiceController {
 
     private ServiceService serviceService;
@@ -78,6 +79,19 @@ public class AutomechServiceController {
     @PostMapping(path = "/automech_services/delete-service")
     public String deleteService(@RequestParam("deletable_service_name") String deletable_service_name) {
         serviceService.delete(deletable_service_name);
+        return "redirect:/automech_services";
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
+    @PostMapping(path = "/automech_services/update-cost")
+    public String updateCostServiceByName(
+            @RequestParam("updatable_service_name") String updatable_service_name,
+            @RequestParam("updatable_service_price") int updatable_service_price) {
+        if(!serviceService.isServiceNameExists(updatable_service_name)) {
+            log.warning("Can't find service in updateCostServiceByName: " + updatable_service_name);
+            return "redirect:/automech_services";
+        }
+        serviceService.updatePriceByName(updatable_service_name, updatable_service_price);
         return "redirect:/automech_services";
     }
 }

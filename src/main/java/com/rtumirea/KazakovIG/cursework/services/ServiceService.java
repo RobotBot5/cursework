@@ -12,4 +12,6 @@ public interface ServiceService {
     boolean isServiceNameExists(String name);
 
     void delete(String name);
+
+    void updatePriceByName(String name, int price);
 }

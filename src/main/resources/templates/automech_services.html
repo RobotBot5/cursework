@@ -29,6 +29,20 @@
     <button type="submit">Удалить сервис</button>
 </form>
 
+<form action="#" th:action="@{/automech_services/update-cost}" method="POST">
+    <select name="updatable_service_name">
+        <option disabled selected>Выберите услугу</option>
+        <th:block th:each="entry : ${servicesByType}">
+            <option disabled th:text="'--' + ${serviceTypeNames[__${entry.key}__]} + '--'"></option>
+            <th:block th:each="service : ${entry.value}">
+                <option th:value="${service.name}" th:text="${service.name}"></option>
+            </th:block>
+        </th:block>
+    </select>
+    <input type="number" name="updatable_service_price" placeholder="Введите новую цену услуги">
+    <button type="submit">Обновить цену услуги</button>
+</form>
+
 <div align="center" th:each="entry : ${servicesByType}">
     <h2 th:text="${serviceTypeNames[__${entry.key}__]}"></h2>
     <table>

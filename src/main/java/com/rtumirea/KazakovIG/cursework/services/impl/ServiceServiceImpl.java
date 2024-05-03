@@ -6,6 +6,7 @@ import com.rtumirea.KazakovIG.cursework.repositories.ServiceRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -40,5 +41,13 @@ public class ServiceServiceImpl implements ServiceService {
     @Override
     public void delete(String name) {
         serviceRepository.delete(serviceRepository.findByName(name).get());
+    }
+
+    @Override
+    public void updatePriceByName(String name, int price) {
+         serviceRepository.findByName(name).map(existingService -> {
+            existingService.setPrice(price);
+            return serviceRepository.save(existingService);
+        });
     }
 }
