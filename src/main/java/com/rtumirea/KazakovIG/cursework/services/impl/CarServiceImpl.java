@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -45,5 +46,10 @@ public class CarServiceImpl implements CarService {
         return carRepository.findAllByUserEntity(
                 userService.findByPhoneNumber(userPhoneNumber)
                         .get());
+    }
+
+    @Override
+    public Optional<CarEntity> findById(Long id) {
+        return carRepository.findById(id);
     }
 }

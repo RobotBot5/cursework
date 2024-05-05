@@ -20,9 +20,9 @@ public class OrderDto {
 
     private Long id;
 
-    private CarEntity carEntity;
+    private Long carId;
 
-    private Set<ServiceEntity> serviceEntity = new HashSet<>();
+    private Set<Long> serviceIds = new HashSet<>();
 
     private UserEntity userEntity;
 

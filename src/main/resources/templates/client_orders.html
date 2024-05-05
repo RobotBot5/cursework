@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Client's orders</title>
+</head>
+<body>
+    <form action="#" th:action="@{/profile/orders/new-order}" th:object="${order}" method="POST">
+        <select th:field="*{carId}" id="make">
+            <option th:each="car : ${client_cars}"
+                    th:value="${car.id}" th:text="${car.make + ' ' + car.bodyType + ' ' + car.stateNumber}"></option>
+        </select>
+<!--        <th:block th:each="entry : ${servicesByType}">-->
+<!--            <p th:text="${serviceTypeNames[__${entry.key}__]}"></p>-->
+<!--            <th:block th:each="service : ${entry.value}">-->
+<!--                <label th:text="${service.name}"><input type="checkbox" th:value="${service.name}" th:field="*{serviceIds}"></label><br>-->
+<!--            </th:block>-->
+<!--        </th:block>-->
+        <ul th:each="entry : ${servicesByType}">
+            <p th:text="${serviceTypeNames[__${entry.key}__]}"></p>
+            <li th:each="service : ${entry.value}">
+                <input type="checkbox" th:field="*{serviceIds}" th:value="${service.id}" />
+                <label th:for="${#ids.prev('serviceIds')}"
+                       th:text="${service.name}"></label>
+            </li>
+        </ul>
+        <button type="submit">Оформить заказ</button>
+    </form>
+</body>
+</html>
