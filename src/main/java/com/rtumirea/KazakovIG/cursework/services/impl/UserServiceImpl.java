@@ -35,4 +35,21 @@ public class UserServiceImpl implements UserService {
     public Optional<UserEntity> findByPhoneNumber(String phoneNumber) {
         return userRepository.findByPhoneNumber(phoneNumber);
     }
+
+    @Override
+    public Optional<UserEntity> findAutoMechWithMinOrdersNum() {
+        return userRepository.findAutoMechsWithMinOrdersNum().stream().findFirst();
+    }
+
+    @Override
+    public void incrementOrderNum(UserEntity autoMechEntity) {
+        autoMechEntity.setOrdersNum(autoMechEntity.getOrdersNum() + 1);
+        userRepository.save(autoMechEntity);
+    }
+
+    @Override
+    public void decrementOrderNum(UserEntity autoMechEntity) {
+        autoMechEntity.setOrdersNum(autoMechEntity.getOrdersNum() - 1);
+        userRepository.save(autoMechEntity);
+    }
 }

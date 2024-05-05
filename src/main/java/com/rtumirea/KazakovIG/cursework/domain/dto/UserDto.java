@@ -21,4 +21,6 @@ public class UserDto {
 
     private String roles;
 
+    private Integer ordersNum;
+
 }

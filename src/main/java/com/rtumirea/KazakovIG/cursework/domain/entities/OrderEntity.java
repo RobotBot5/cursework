@@ -29,7 +29,7 @@ public class OrderEntity {
     @ManyToMany
     @JoinTable(
             name = "order_service",
-            joinColumns = { @JoinColumn(name = "oder_id") },
+            joinColumns = { @JoinColumn(name = "order_id") },
             inverseJoinColumns = { @JoinColumn(name = "service_id") }
     )
     private Set<ServiceEntity> serviceEntity = new HashSet<>();

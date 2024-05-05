@@ -5,10 +5,10 @@ import com.rtumirea.KazakovIG.cursework.domain.dto.OrderDto;
 import com.rtumirea.KazakovIG.cursework.domain.entities.CarEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.OrderEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.ServiceEntity;
+import com.rtumirea.KazakovIG.cursework.domain.entities.UserEntity;
 import com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus;
 import com.rtumirea.KazakovIG.cursework.domain.enums.ServiceType;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
-import com.rtumirea.KazakovIG.cursework.repositories.CarRepository;
 import com.rtumirea.KazakovIG.cursework.services.CarService;
 import com.rtumirea.KazakovIG.cursework.services.OrderService;
 import com.rtumirea.KazakovIG.cursework.services.ServiceService;
@@ -76,12 +76,11 @@ public class OrderController {
     @PostMapping(path = "/profile/orders/new-order")
     public String createOrder(@ModelAttribute OrderDto orderDto) {
         OrderEntity orderEntity = orderMapper.mapFrom(orderDto);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userPhoneNumber = authentication.getName();
-        orderEntity.setUserEntity(userService.findByPhoneNumber(userPhoneNumber).get());
         orderEntity.setOrderStatus(OrderStatus.PENDING);
+        UserEntity autoMechToOrder = userService.findAutoMechWithMinOrdersNum().get();
+        orderEntity.setUserEntity(autoMechToOrder);
 
-        orderService.createOrder(orderEntity);
+        orderService.createOrder(orderEntity, autoMechToOrder);
         return "redirect:/profile/orders";
     }
 

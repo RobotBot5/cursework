@@ -27,4 +27,7 @@ public class UserEntity {
 
     private String roles;
 
+    @JoinColumn(name = "orders_num")
+    private Integer ordersNum;
+
 }

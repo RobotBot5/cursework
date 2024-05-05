@@ -10,4 +10,10 @@ public interface UserService {
     boolean isUserExists(String phoneNumber);
 
     Optional<UserEntity> findByPhoneNumber(String phoneNumber);
+
+    Optional<UserEntity> findAutoMechWithMinOrdersNum();
+
+    void incrementOrderNum(UserEntity autoMechEntity);
+
+    void decrementOrderNum(UserEntity autoMechEntity);
 }
