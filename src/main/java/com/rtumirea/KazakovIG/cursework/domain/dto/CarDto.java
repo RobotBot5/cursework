@@ -1,5 +1,8 @@
 package com.rtumirea.KazakovIG.cursework.domain.dto;
 
+import com.rtumirea.KazakovIG.cursework.domain.entities.UserEntity;
+import com.rtumirea.KazakovIG.cursework.domain.enums.CarMake;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,12 +16,14 @@ public class CarDto {
 
     private Long id;
 
-    private String make;
+    private String stateNumber;
 
-    private String model;
+    private CarMake make;
+
+    private String bodyType;
 
     private Integer year;
 
-    private UserDto userDto;
+    private UserEntity userEntity;
 
 }

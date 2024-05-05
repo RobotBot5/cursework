@@ -12,26 +12,89 @@
     <table>
         <thead>
             <tr>
+                <th>ГосНомер</th>
                 <th>Марка</th>
-                <th>Модель</th>
+                <th>Кузов</th>
                 <th>Год выпуска</th>
             </tr>
         </thead>
         <tbody>
             <tr th:each="car : ${listCars}">
+                <td th:text="${car.stateNumber}"></td>
                 <td th:text="${car.make}"></td>
-                <td th:text="${car.model}"></td>
+                <td th:text="${car.bodyType}"></td>
                 <td th:text="${car.year}"></td>
             </tr>
         </tbody>
     </table>
     <h2>Добавить автомобиль</h2>
     <form action="#" th:action="@{/profile/new-car}" th:object="${car}" method="POST">
-        <input type="text" th:field="*{make}" placeholder="Введите производителя">
-        <input type="text" th:field="*{model}" placeholder="Введите модель">
-        <input type="text" th:field="*{year}" placeholder="Введите год выпуска">
+        <select th:field="*{make}" id="make">
+            <option th:each="make : ${T(com.rtumirea.KazakovIG.cursework.domain.enums.CarMake).values()}"
+                    th:value="${make}" th:text="${make}"></option>
+        </select>
+<!--        TO-DO-->
+        <select th:field="*{bodyType}" id="bodyType" name="bodyType">
+            <option th:each="bmwBodyType : ${T(com.rtumirea.KazakovIG.cursework.domain.enums.BmwBodyType).values()}"
+                    th:value="${bmwBodyType}" th:text="${bmwBodyType}" class="BMW">
+            <option th:each="mercedesBodyType : ${T(com.rtumirea.KazakovIG.cursework.domain.enums.MercedesBodyType).values()}"
+                    th:value="${mercedesBodyType}" th:text="${mercedesBodyType}" class="MERCEDES">
+            <option th:each="audiBodyType : ${T(com.rtumirea.KazakovIG.cursework.domain.enums.AudiBodyType).values()}"
+                    th:value="${audiBodyType}" th:text="${audiBodyType}" class="AUDI">
+        </select>
+        <input type="number" th:field="*{year}" placeholder="Введите год выпуска">
+        <input type="text" th:field="*{stateNumber}" placeholder="Введите ГосНомер машины">
         <button type="submit">Добавить</button>
     </form>
+
+    <script>
+        (() => {
+            const dynamicSelect = (id1, id2) => {
+                // Определение переменных, ссылающихся на списки
+                const sel1 = document.getElementById(id1);
+                const sel2 = document.getElementById(id2);
+                // Клонирование динамического списка
+                const clone = sel2.cloneNode(true);
+                // Определение переменных для клонированных элементов списка
+                const clonedOptions = clone.getElementsByTagName("option");
+                // Вызов функции собирающей вызываемый список
+                refreshDynamicSelectOptions(sel1, sel2, clonedOptions);
+                // При изменении выбранного элемента в первом списке: // вызов функции пересобирающей вызываемый список
+                sel1.addEventListener('change', () => {
+                    refreshDynamicSelectOptions(sel1, sel2, clonedOptions);
+                });
+            };
+
+            // Функция для сборки динамического списка
+            const refreshDynamicSelectOptions = (sel1, sel2, clonedOptions) => {
+                // Удаление всех элементов динамического списка
+                while (sel2.options.length) {
+                    sel2.remove(0);
+                }
+                const selectedOption = sel1.options[sel1.selectedIndex].value;
+                // Перебор клонированных элементов списка
+                for (let i = 0; i < clonedOptions.length; i++) {
+                    const option = clonedOptions[i];
+                    // Если название класса клонированного option эквивалентно "select"
+                    // либо эквивалентно значению option первого списка
+                    if (option.classList.contains('select') ||
+                        option.classList.contains(selectedOption)) {
+                        // его нужно клонировать в динамически создаваемый список
+                        sel2.appendChild(option.cloneNode(true));
+                    }
+                }
+                // Отправляем событие change выбранного select
+                const event = document.createEvent('HTMLEvents');
+                event.initEvent('change', true, false);
+                sel2.dispatchEvent(event);
+            };
+
+            // Вызов скрипта при загрузке страницы
+            document.addEventListener("DOMContentLoaded", () => {
+                dynamicSelect("make", "bodyType");
+            });
+        })();
+    </script>
     <p>Хотите перейти к услугам? <a th:href="@{/client_services}">Услуги</a></p>
 </body>
 </html>
