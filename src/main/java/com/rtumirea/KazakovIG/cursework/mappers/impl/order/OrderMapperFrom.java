@@ -1,6 +1,6 @@
-package com.rtumirea.KazakovIG.cursework.mappers.impl;
+package com.rtumirea.KazakovIG.cursework.mappers.impl.order;
 
-import com.rtumirea.KazakovIG.cursework.domain.dto.OrderDto;
+import com.rtumirea.KazakovIG.cursework.domain.dto.order.OrderDtoFrom;
 import com.rtumirea.KazakovIG.cursework.domain.entities.OrderEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.ServiceEntity;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
@@ -11,20 +11,20 @@ import org.springframework.stereotype.Component;
 import java.util.stream.Collectors;
 
 @Component
-public class OrderMapper implements Mapper<OrderEntity, OrderDto> {
+public class OrderMapperFrom implements Mapper<OrderEntity, OrderDtoFrom> {
 
     private ServiceService serviceService;
 
     private CarService carService;
 
-    public OrderMapper(ServiceService serviceService, CarService carService) {
+    public OrderMapperFrom(ServiceService serviceService, CarService carService) {
         this.serviceService = serviceService;
         this.carService = carService;
     }
 
     @Override
-    public OrderDto mapTo(OrderEntity orderEntity) {
-        return OrderDto.builder()
+    public OrderDtoFrom mapTo(OrderEntity orderEntity) {
+        return OrderDtoFrom.builder()
                 .id(orderEntity.getId())
                 .serviceIds(orderEntity.getServiceEntity().stream().map(ServiceEntity::getId).collect(Collectors.toSet()))
                 .carId(orderEntity.getCarEntity().getId())
@@ -34,7 +34,7 @@ public class OrderMapper implements Mapper<OrderEntity, OrderDto> {
     }
 
     @Override
-    public OrderEntity mapFrom(OrderDto orderDto) {
+    public OrderEntity mapFrom(OrderDtoFrom orderDto) {
         return OrderEntity.builder()
                 .id(orderDto.getId())
                 .serviceEntity(orderDto.getServiceIds().stream().map(serviceId -> serviceService.findById(serviceId).get()).collect(Collectors.toSet()))

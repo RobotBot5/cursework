@@ -1,7 +1,5 @@
-package com.rtumirea.KazakovIG.cursework.domain.dto;
+package com.rtumirea.KazakovIG.cursework.domain.dto.order;
 
-import com.rtumirea.KazakovIG.cursework.domain.entities.CarEntity;
-import com.rtumirea.KazakovIG.cursework.domain.entities.ServiceEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.UserEntity;
 import com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus;
 import lombok.AllArgsConstructor;
@@ -16,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderDto {
+public class OrderDtoFrom {
 
     private Long id;
 

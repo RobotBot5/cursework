@@ -1,7 +1,9 @@
 package com.rtumirea.KazakovIG.cursework.services.impl;
 
 import com.rtumirea.KazakovIG.cursework.domain.entities.CarEntity;
+import com.rtumirea.KazakovIG.cursework.domain.entities.UserEntity;
 import com.rtumirea.KazakovIG.cursework.repositories.CarRepository;
+import com.rtumirea.KazakovIG.cursework.repositories.OrderRepository;
 import com.rtumirea.KazakovIG.cursework.services.CarService;
 import com.rtumirea.KazakovIG.cursework.services.OrderService;
 import com.rtumirea.KazakovIG.cursework.services.UserService;
@@ -21,12 +23,12 @@ public class CarServiceImpl implements CarService {
 
     private UserService userService;
 
-    private OrderService orderService;
+    private OrderRepository orderRepository;
 
-    public CarServiceImpl(CarRepository carRepository, UserService userService, OrderService orderService) {
+    public CarServiceImpl(CarRepository carRepository, UserService userService, OrderRepository orderRepository) {
         this.carRepository = carRepository;
         this.userService = userService;
-        this.orderService = orderService;
+        this.orderRepository = orderRepository;
     }
 
     @Override
@@ -63,7 +65,12 @@ public class CarServiceImpl implements CarService {
         return currentUserCars
                 .stream()
                 .filter(currentUserCar ->
-                        !orderService.isExistCar(currentUserCar))
+                        !orderRepository.existsByCarEntity(currentUserCar))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CarEntity> findCarsOfClient(UserEntity userEntity) {
+        return carRepository.findAllByUserEntity(userEntity);
     }
 }

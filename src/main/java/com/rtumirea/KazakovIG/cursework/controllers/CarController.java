@@ -1,15 +1,17 @@
 package com.rtumirea.KazakovIG.cursework.controllers;
 
 import com.rtumirea.KazakovIG.cursework.domain.dto.CarDto;
+import com.rtumirea.KazakovIG.cursework.domain.dto.order.OrderDtoFrom;
 import com.rtumirea.KazakovIG.cursework.domain.dto.UserDto;
+import com.rtumirea.KazakovIG.cursework.domain.dto.order.OrderDtoTo;
 import com.rtumirea.KazakovIG.cursework.domain.entities.CarEntity;
+import com.rtumirea.KazakovIG.cursework.domain.entities.OrderEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.ServiceEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.UserEntity;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
-import com.rtumirea.KazakovIG.cursework.mappers.impl.CarMapper;
 import com.rtumirea.KazakovIG.cursework.services.CarService;
+import com.rtumirea.KazakovIG.cursework.services.OrderService;
 import com.rtumirea.KazakovIG.cursework.services.UserService;
-import lombok.extern.java.Log;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,10 +20,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -36,11 +36,20 @@ public class CarController {
 
     private Mapper<UserEntity, UserDto> userMapper;
 
-    public CarController(CarService carService, Mapper<CarEntity, CarDto> carMapper, UserService userService, Mapper<UserEntity, UserDto> userMapper) {
+    private OrderService orderService;
+
+    private Mapper<OrderEntity, OrderDtoTo> orderMapperTo;
+
+    public CarController(CarService carService, Mapper<CarEntity,
+            CarDto> carMapper, UserService userService,
+                         Mapper<UserEntity, UserDto> userMapper, OrderService orderService,
+                         Mapper<OrderEntity, OrderDtoTo> orderMapperTo) {
         this.carService = carService;
         this.carMapper = carMapper;
         this.userService = userService;
         this.userMapper = userMapper;
+        this.orderService = orderService;
+        this.orderMapperTo = orderMapperTo;
     }
 
     @PreAuthorize("hasAuthority('ROLE_CLIENT')")
@@ -59,6 +68,22 @@ public class CarController {
         Optional<UserDto> userDto = userEntity.map(userMapper::mapTo);
         model.addAttribute("user", userDto.get());
 
+        List<OrderEntity> clientOrdersEntities = orderService.findByCurrentUser();
+        List<OrderDtoTo> clientOrdersDto = clientOrdersEntities
+                .stream().map(orderMapperTo::mapTo)
+                .collect(Collectors.toList());
+        model.addAttribute("orders", clientOrdersDto);
+
+        List<Integer> totalPrices = new ArrayList<>();
+        for (OrderDtoTo order : clientOrdersDto) {
+            int totalPrice = order.getServiceEntity().stream()
+                    .mapToInt(ServiceEntity::getPrice)
+                    .sum();
+            totalPrices.add(totalPrice);
+        }
+        model.addAttribute("totals", totalPrices);
+
+        model.addAttribute("statusesTypeNames", getStatusesTypeNames());
         return "profile";
     }
 
@@ -71,5 +96,15 @@ public class CarController {
         carEntity.setUserEntity(userService.findByPhoneNumber(userPhoneNumber).get());
         carService.createCar(carEntity);
         return "redirect:/profile";
+    }
+
+    public Map<String, String> getStatusesTypeNames() {
+        Map<String, String> statusesTypeNames = new HashMap<>();
+        statusesTypeNames.put("PENDING", "В обработке");
+        statusesTypeNames.put("WAITING_CAR", "Ожидание машины");
+        statusesTypeNames.put("IN_PROGRESS", "В работе");
+        statusesTypeNames.put("COMPLETED", "Завершено");
+        statusesTypeNames.put("DIESEL_ENGINE_REPAIR", "Ремонт дизельных двигателей");
+        return statusesTypeNames;
     }
 }

@@ -33,7 +33,6 @@
             <option th:each="make : ${T(com.rtumirea.KazakovIG.cursework.domain.enums.CarMake).values()}"
                     th:value="${make}" th:text="${make}"></option>
         </select>
-<!--        TO-DO-->
         <select th:field="*{bodyType}" id="bodyType" name="bodyType">
             <option th:each="bmwBodyType : ${T(com.rtumirea.KazakovIG.cursework.domain.enums.BmwBodyType).values()}"
                     th:value="${bmwBodyType}" th:text="${bmwBodyType}" class="BMW">
@@ -46,9 +45,49 @@
         <input type="text" th:field="*{stateNumber}" placeholder="Введите ГосНомер машины">
         <button type="submit">Добавить</button>
     </form>
-    <p> <a th:href="@{/profile/orders}">Посмотреть заказы</a></p>
+    <p> <a th:href="@{/profile/orders}">Оформить новый заказ</a></p>
 
-    <script>
+    <h1>Список заказов</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Номер заказа</th>
+            <th>Машина</th>
+            <th>Статус</th>
+            <th>Механик</th>
+            <th>Услуги</th>
+            <th>Общая сумма</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order, index : ${orders}">
+            <td th:text="${order.id}"></td>
+            <td th:text="${order.carEntity.make + ' ' + order.carEntity.bodyType + ' ' + order.carEntity.stateNumber}"></td>
+            <td th:text="${statusesTypeNames[__${order.orderStatus}__]}"></td>
+            <td th:text="${order.userEntity.name + ' (' + order.userEntity.phoneNumber + ')'}"></td>
+            <td>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Название услуги</th>
+                            <th>Цена</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="service : ${order.serviceEntity}">
+                            <td th:text="${service.name}"></td>
+                            <td th:text="${service.price}"></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+            <td th:text="${totals[__${index.index}__]}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <script th:inline="javascript">
         (() => {
             const dynamicSelect = (id1, id2) => {
                 // Определение переменных, ссылающихся на списки
