@@ -59,7 +59,7 @@ public class OrderController {
     @GetMapping(path = "/profile/orders")
     public String orderList(Model model) {
         model.addAttribute("client_cars", carService
-                .findCurrentUserCars().stream()
+                .findCurrentUserCarsWithoutOrders().stream()
                 .map(carMapper::mapTo).collect(Collectors.toList()));
         model.addAttribute("order", new OrderDto());
 

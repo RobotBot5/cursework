@@ -3,6 +3,7 @@ package com.rtumirea.KazakovIG.cursework.services.impl;
 import com.rtumirea.KazakovIG.cursework.domain.entities.CarEntity;
 import com.rtumirea.KazakovIG.cursework.repositories.CarRepository;
 import com.rtumirea.KazakovIG.cursework.services.CarService;
+import com.rtumirea.KazakovIG.cursework.services.OrderService;
 import com.rtumirea.KazakovIG.cursework.services.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,9 +21,12 @@ public class CarServiceImpl implements CarService {
 
     private UserService userService;
 
-    public CarServiceImpl(CarRepository carRepository, UserService userService) {
+    private OrderService orderService;
+
+    public CarServiceImpl(CarRepository carRepository, UserService userService, OrderService orderService) {
         this.carRepository = carRepository;
         this.userService = userService;
+        this.orderService = orderService;
     }
 
     @Override
@@ -51,5 +55,15 @@ public class CarServiceImpl implements CarService {
     @Override
     public Optional<CarEntity> findById(Long id) {
         return carRepository.findById(id);
+    }
+
+    @Override
+    public List<CarEntity> findCurrentUserCarsWithoutOrders() {
+        List<CarEntity> currentUserCars = findCurrentUserCars();
+        return currentUserCars
+                .stream()
+                .filter(currentUserCar ->
+                        !orderService.isExistCar(currentUserCar))
+                .collect(Collectors.toList());
     }
 }
