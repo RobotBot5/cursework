@@ -16,4 +16,6 @@ public interface UserService {
     void incrementOrderNum(UserEntity autoMechEntity);
 
     void decrementOrderNum(UserEntity autoMechEntity);
+
+    void addAutoMech(String phoneNumber, String name, String password);
 }
