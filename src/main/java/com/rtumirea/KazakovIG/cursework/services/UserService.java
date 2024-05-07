@@ -10,4 +10,6 @@ public interface UserService {
     boolean isUserExists(String phoneNumber);
 
     Optional<UserEntity> findByPhoneNumber(String phoneNumber);
+
+    void createAutoMech(String name, String phoneNumber, String password);
 }

@@ -35,4 +35,14 @@ public class UserServiceImpl implements UserService {
     public Optional<UserEntity> findByPhoneNumber(String phoneNumber) {
         return userRepository.findByPhoneNumber(phoneNumber);
     }
+
+    @Override
+    public void createAutoMech(String name, String phoneNumber, String password) {
+        userRepository.save(UserEntity.builder()
+                        .phoneNumber(phoneNumber)
+                        .name(name)
+                        .roles("ROLE_AUTOMECH")
+                        .password(passwordEncoder.encode(password))
+                .build());
+    }
 }
