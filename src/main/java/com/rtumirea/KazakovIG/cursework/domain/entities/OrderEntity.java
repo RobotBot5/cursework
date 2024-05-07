@@ -42,4 +42,9 @@ public class OrderEntity {
     @JoinColumn(name = "status")
     private OrderStatus orderStatus;
 
+    @JoinColumn(name = "working_time")
+    private Integer workingTime;
+
+    @JoinColumn(name = "details_waiting")
+    private Integer detailsWaiting;
 }

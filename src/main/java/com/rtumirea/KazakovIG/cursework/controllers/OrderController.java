@@ -77,8 +77,9 @@ public class OrderController {
         orderEntity.setOrderStatus(OrderStatus.PENDING);
         UserEntity autoMechToOrder = userService.findAutoMechWithMinOrdersNum().get();
         orderEntity.setUserEntity(autoMechToOrder);
+        userService.incrementOrderNum(autoMechToOrder);
 
-        orderService.createOrder(orderEntity, autoMechToOrder);
+        orderService.createOrder(orderEntity);
         return "redirect:/profile/orders";
     }
 

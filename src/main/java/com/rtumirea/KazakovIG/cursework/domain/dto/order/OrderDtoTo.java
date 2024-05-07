@@ -4,6 +4,7 @@ import com.rtumirea.KazakovIG.cursework.domain.entities.CarEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.ServiceEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.UserEntity;
 import com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus;
+import jakarta.persistence.JoinColumn;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,4 +29,7 @@ public class OrderDtoTo {
 
     private OrderStatus orderStatus;
 
+    private Integer workingTime;
+
+    private Integer detailsWaiting;
 }

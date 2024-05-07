@@ -1,7 +1,6 @@
 package com.rtumirea.KazakovIG.cursework.controllers;
 
 import com.rtumirea.KazakovIG.cursework.domain.dto.CarDto;
-import com.rtumirea.KazakovIG.cursework.domain.dto.order.OrderDtoFrom;
 import com.rtumirea.KazakovIG.cursework.domain.dto.UserDto;
 import com.rtumirea.KazakovIG.cursework.domain.dto.order.OrderDtoTo;
 import com.rtumirea.KazakovIG.cursework.domain.entities.CarEntity;
@@ -68,7 +67,7 @@ public class CarController {
         Optional<UserDto> userDto = userEntity.map(userMapper::mapTo);
         model.addAttribute("user", userDto.get());
 
-        List<OrderEntity> clientOrdersEntities = orderService.findByCurrentUser();
+        List<OrderEntity> clientOrdersEntities = orderService.findByCurrentClient();
         List<OrderDtoTo> clientOrdersDto = clientOrdersEntities
                 .stream().map(orderMapperTo::mapTo)
                 .collect(Collectors.toList());

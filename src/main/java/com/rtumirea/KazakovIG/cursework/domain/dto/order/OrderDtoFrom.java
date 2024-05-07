@@ -25,4 +25,8 @@ public class OrderDtoFrom {
     private UserEntity userEntity;
 
     private OrderStatus orderStatus;
+
+    private Integer workingTime;
+
+    private Integer detailsWaiting;
 }

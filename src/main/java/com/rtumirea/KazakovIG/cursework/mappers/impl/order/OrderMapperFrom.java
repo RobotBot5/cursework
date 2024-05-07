@@ -30,6 +30,8 @@ public class OrderMapperFrom implements Mapper<OrderEntity, OrderDtoFrom> {
                 .carId(orderEntity.getCarEntity().getId())
                 .userEntity(orderEntity.getUserEntity())
                 .orderStatus(orderEntity.getOrderStatus())
+                .detailsWaiting(orderEntity.getDetailsWaiting())
+                .workingTime(orderEntity.getWorkingTime())
                 .build();
     }
 
@@ -41,6 +43,8 @@ public class OrderMapperFrom implements Mapper<OrderEntity, OrderDtoFrom> {
                 .carEntity(carService.findById(orderDto.getCarId()).get())
                 .userEntity(orderDto.getUserEntity())
                 .orderStatus(orderDto.getOrderStatus())
+                .detailsWaiting(orderDto.getDetailsWaiting())
+                .workingTime(orderDto.getWorkingTime())
                 .build();
     }
 }
