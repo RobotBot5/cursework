@@ -12,6 +12,7 @@
             <thead>
             <tr>
                 <th>Номер заказа</th>
+                <th>Клиент</th>
                 <th>Машина</th>
                 <th>Услуги</th>
                 <th>Есть ли детали на складе?</th>
@@ -19,9 +20,15 @@
             </tr>
             </thead>
             <tbody>
-            <tr >
+            <tr>
                 <input type="hidden" th:name="|id|" th:value="${order.id}" />
                 <td th:text="${order.id}"></td>
+                <td>
+                    <ul>
+                        <li th:text="'Имя: ' + ${order.carEntity.userEntity.name}"></li>
+                        <li th:text="'Номер телефона: ' + ${order.carEntity.userEntity.phoneNumber}"></li>
+                    </ul>
+                </td>
                 <td th:text="${order.carEntity.make + ' ' + order.carEntity.bodyType + ' ' + order.carEntity.stateNumber}"></td>
                 <td>
                     <ul th:each="service : ${order.serviceEntity}">
@@ -30,11 +37,11 @@
                     </ul>
                 </td>
                 <td>
-                    <input type="checkbox" th:id="'detailsCheckbox' + ${index}" />
-                    <input th:name="|detailsWaiting|" type="number" th:id="'detailsWaitingTime' + ${index}" placeholder="Сколько дней?" />
+                    <input type="checkbox" th:id="'detailsCheckbox' + ${index.index}" th:onclick="'toggleDisabled(' + ${index.index} + ')'" name="detailsCheckbox" />
+                    <input required th:name="|detailsWaiting|" type="number" th:id="'detailsWaitingTime' + ${index.index}" placeholder="Сколько дней?" />
                 </td>
                 <td>
-                    <input th:name="|workingTime|" type="number" th:id="'workingTime' + ${index}" placeholder="Примерное время работы" />
+                    <input required th:name="|workingTime|" type="number" th:id="'workingTime' + ${index.index}" placeholder="Примерное время работы" />
                 </td>
             </tr>
             </tbody>
@@ -42,6 +49,20 @@
         </table>
     </form>
 </div>
+<script th:inline="javascript">
+    function toggleDisabled(index) {
+        // Получаем чекбокс
+        const checkbox = document.getElementById('detailsCheckbox' + index);
+        // Получаем второй ввод
+        const input = document.getElementById('detailsWaitingTime' + index);
 
+        // Если чекбокс отмечен, выключаем второй ввод, иначе включаем
+        if (checkbox.checked) {
+            input.disabled = true;
+        } else {
+            input.disabled = false;
+        }
+    }
+</script>
 </body>
 </html>

@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,8 +43,9 @@ public class AutomechOrdersController {
 
     @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
     @PostMapping(path = "/automech/orders/update-order")
-    public String updatePandingOrder(@ModelAttribute OrderDtoTo orderDto) {
+    public String updatePandingOrder(@ModelAttribute OrderDtoTo orderDto, @RequestParam(name = "detailsCheckbox", required = false) Boolean detailsCheckbox) {
         orderDto.setOrderStatus(OrderStatus.IN_PROGRESS);
+        if (detailsCheckbox != null) orderDto.setDetailsWaiting(0);
         OrderEntity orderEntity = orderMapperTo.mapFrom(orderDto);
         orderService.updatePendingStatus(orderEntity);
 
