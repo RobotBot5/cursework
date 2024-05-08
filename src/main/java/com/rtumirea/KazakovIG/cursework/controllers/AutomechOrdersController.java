@@ -44,7 +44,7 @@ public class AutomechOrdersController {
     @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
     @PostMapping(path = "/automech/orders/update-order")
     public String updatePandingOrder(@ModelAttribute OrderDtoTo orderDto, @RequestParam(name = "detailsCheckbox", required = false) Boolean detailsCheckbox) {
-        orderDto.setOrderStatus(OrderStatus.IN_PROGRESS);
+        orderDto.setOrderStatus(OrderStatus.AWAITING_SCHEDULING);
         if (detailsCheckbox != null) orderDto.setDetailsWaiting(0);
         OrderEntity orderEntity = orderMapperTo.mapFrom(orderDto);
         orderService.updatePendingStatus(orderEntity);

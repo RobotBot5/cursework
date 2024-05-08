@@ -4,7 +4,9 @@ public enum OrderStatus {
 
     PENDING,
 
-    WAITING_CAR,
+    AWAITING_SCHEDULING,
+
+    AWAITING_CAR,
 
     IN_PROGRESS,
 
