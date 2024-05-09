@@ -11,7 +11,7 @@ public interface OrderService {
 
     boolean isExistCar(CarEntity currentUserCar);
 
-    List<OrderEntity> findByCurrentClient();
+    List<OrderEntity> findByCurrentClientAndStatus(OrderStatus status);
 
     List<OrderEntity> findByCurrentAutomechAndStatus(OrderStatus status);
 

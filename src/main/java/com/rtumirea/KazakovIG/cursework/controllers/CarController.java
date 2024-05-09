@@ -5,6 +5,7 @@ import com.rtumirea.KazakovIG.cursework.domain.dto.ScheduleDto;
 import com.rtumirea.KazakovIG.cursework.domain.dto.UserDto;
 import com.rtumirea.KazakovIG.cursework.domain.dto.order.OrderDtoTo;
 import com.rtumirea.KazakovIG.cursework.domain.entities.*;
+import com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
 import com.rtumirea.KazakovIG.cursework.services.CarService;
 import com.rtumirea.KazakovIG.cursework.services.OrderService;
@@ -18,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -75,14 +77,14 @@ public class CarController {
         Optional<UserDto> userDto = userEntity.map(userMapper::mapTo);
         model.addAttribute("user", userDto.get());
 
-        List<OrderEntity> clientOrdersEntities = orderService.findByCurrentClient();
-        List<OrderDtoTo> clientOrdersDto = clientOrdersEntities
+        List<OrderEntity> clientOrdersEntitiesWithPendingStatus = orderService.findByCurrentClientAndStatus(OrderStatus.PENDING);
+        List<OrderDtoTo> clientOrdersDtoWithPendingStatus = clientOrdersEntitiesWithPendingStatus
                 .stream().map(orderMapperTo::mapTo)
                 .collect(Collectors.toList());
-        model.addAttribute("orders", clientOrdersDto);
+        model.addAttribute("ordersPending", clientOrdersDtoWithPendingStatus);
 
         List<Integer> totalPrices = new ArrayList<>();
-        for (OrderDtoTo order : clientOrdersDto) {
+        for (OrderDtoTo order : clientOrdersDtoWithPendingStatus) {
             int totalPrice = order.getServiceEntity().stream()
                     .mapToInt(ServiceEntity::getPrice)
                     .sum();
@@ -98,7 +100,22 @@ public class CarController {
                 .map(ScheduleEntity::getDay)
                 .collect(Collectors.toSet());
         model.addAttribute("freeSlotsDays", freeSlotsDays);
+
+        List<OrderEntity> clientOrdersEntitiesWithSchedulingStatus = orderService.findByCurrentClientAndStatus(OrderStatus.AWAITING_SCHEDULING);
+        List<OrderDtoTo> clientOrdersDtoWithSchedulingStatus = clientOrdersEntitiesWithSchedulingStatus
+                .stream().map(orderMapperTo::mapTo)
+                .collect(Collectors.toList());
+        model.addAttribute("ordersScheduling", clientOrdersDtoWithSchedulingStatus);
+
         return "profile";
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_CLIENT')")
+    @PostMapping(path = "/profile/schedule/book")
+    public String bookSchedule(@RequestParam("slotId") Long slotId,
+                               @RequestParam("scheduleOrderChoice") Long orderId) {
+        scheduleService.bookSlot(slotId, orderId);
+        return "redirect:/profile";
     }
 
     @PreAuthorize("hasAuthority('ROLE_CLIENT')")

@@ -10,4 +10,6 @@ public interface ScheduleService {
     void generateSchedule(LocalDate startDate, LocalDate endDate, int intervalInMinutes);
 
     List<ScheduleEntity> getFreeSlots();
+
+    void bookSlot(Long slotId, Long orderId);
 }

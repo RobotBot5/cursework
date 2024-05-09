@@ -1,7 +1,10 @@
 package com.rtumirea.KazakovIG.cursework.services.impl;
 
+import com.rtumirea.KazakovIG.cursework.domain.entities.OrderEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.ScheduleEntity;
+import com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus;
 import com.rtumirea.KazakovIG.cursework.domain.enums.ScheduleStatus;
+import com.rtumirea.KazakovIG.cursework.repositories.OrderRepository;
 import com.rtumirea.KazakovIG.cursework.repositories.ScheduleRepository;
 import com.rtumirea.KazakovIG.cursework.services.ScheduleService;
 import org.springframework.stereotype.Service;
@@ -11,6 +14,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,8 +22,11 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private ScheduleRepository scheduleRepository;
 
-    public ScheduleServiceImpl(ScheduleRepository scheduleRepository) {
+    private OrderRepository orderRepository;
+
+    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, OrderRepository orderRepository) {
         this.scheduleRepository = scheduleRepository;
+        this.orderRepository = orderRepository;
     }
 
     @Override
@@ -55,5 +62,16 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .filter(scheduleEntity ->
                         scheduleEntity.getDay().isAfter(LocalDate.now()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void bookSlot(Long slotId, Long orderId) {
+        OrderEntity orderEntity = orderRepository.findById(orderId).get();
+        orderEntity.setOrderStatus(OrderStatus.AWAITING_CAR);
+        orderRepository.save(orderEntity);
+        ScheduleEntity scheduleEntity = scheduleRepository.findById(slotId).get();
+        scheduleEntity.setStatus(ScheduleStatus.BOOKED);
+        scheduleEntity.setOrderEntity(orderEntity);
+        scheduleRepository.save(scheduleEntity);
     }
 }

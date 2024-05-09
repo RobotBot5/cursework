@@ -47,23 +47,21 @@
     </form>
     <p> <a th:href="@{/profile/orders}">Оформить новый заказ</a></p>
 
-    <h1>Список заказов</h1>
+    <h1>Список заказов в обработке</h1>
     <table>
         <thead>
         <tr>
             <th>Номер заказа</th>
             <th>Машина</th>
-            <th>Статус</th>
             <th>Механик</th>
             <th>Услуги</th>
             <th>Общая сумма</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="order, index : ${orders}">
+        <tr th:each="order, index : ${ordersPending}">
             <td th:text="${order.id}"></td>
             <td th:text="${order.carEntity.make + ' ' + order.carEntity.bodyType + ' ' + order.carEntity.stateNumber}"></td>
-            <td th:text="${statusesTypeNames[__${order.orderStatus}__]}"></td>
             <td th:text="${order.userEntity.name + ' (' + order.userEntity.phoneNumber + ')'}"></td>
             <td>
                 <table>
@@ -87,32 +85,76 @@
         </tbody>
     </table>
 
-    <select id="daySelector">
-        <option th:each="freeSlotDay : ${freeSlotsDays}" th:text="${#temporals.format(freeSlotDay, 'dd.MM')}" th:value="${freeSlotDay}"></option>
-    </select>
+    <h1>Список заказов, ожидающих записи</h1>
+    <form th:action="@{/profile/schedule/book}" method="post">
+        <table>
+            <thead>
+            <tr>
+                <th>Номер заказа</th>
+                <th>Машина</th>
+                <th>Механик</th>
+                <th>Услуги</th>
+                <th>Время работы</th>
+                <th>Время доставки деталей</th>
+                <th>Выбрать</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order, index : ${ordersScheduling}">
+                <td th:text="${order.id}"></td>
+                <td th:text="${order.carEntity.make + ' ' + order.carEntity.bodyType + ' ' + order.carEntity.stateNumber}"></td>
+                <td th:text="${order.userEntity.name + ' (' + order.userEntity.phoneNumber + ')'}"></td>
+                <td>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Название услуги</th>
+                            <th>Цена</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="service : ${order.serviceEntity}">
+                            <td th:text="${service.name}"></td>
+                            <td th:text="${service.price}"></td>
+                            <td></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td th:text="${order.workingTime}"></td>
+                <td th:text="${order.detailsWaiting}"></td>
+                <td><input type="radio" name="scheduleOrderChoice" th:value="${order.id}" /></td>
+            </tr>
+            </tbody>
+        </table>
 
-    <h1>Free Slots</h1>
-    <table>
-        <thead>
-        <tr>
-            <th>Start Time</th>
-            <th>End Time</th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody id="freeSlots">
-        <tr th:each="slot : ${freeSlots}" th:class="${slot.day} + ' schedule'">
-            <td th:text="${#temporals.format(slot.day, 'dd.MM')}"></td>
-            <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
-            <td>
-                <form th:action="@{/bookSlot}" method="post">
-                    <input type="hidden" th:name="slotId" th:value="${slot.id}"/>
-                    <button type="submit">Book</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+        <h1>Выберете время</h1>
+
+        <select id="daySelector">
+            <option th:each="freeSlotDay : ${freeSlotsDays}" th:text="${#temporals.format(freeSlotDay, 'dd.MM')}" th:value="${freeSlotDay}"></option>
+        </select>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Время</th>
+                <th>Записаться</th>
+            </tr>
+            </thead>
+            <tbody id="freeSlots">
+            <tr th:each="slot : ${freeSlots}" th:class="${slot.day} + ' schedule'">
+                <td th:text="${#temporals.format(slot.day, 'dd.MM')}"></td>
+                <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
+                <td>
+                    <input type="hidden"/>
+                    <button th:name="slotId" th:value="${slot.id}" type="submit">Записаться</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+
 
     <p>Хотите перейти к услугам? <a th:href="@{/client_services}">Услуги</a></p>
 

@@ -45,11 +45,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderEntity> findByCurrentClient() {
+    public List<OrderEntity> findByCurrentClientAndStatus(OrderStatus status) {
         List<CarEntity> carsOfClient = carService.findCurrentUserCars();
         return carsOfClient.stream()
                 .map(carEntity -> orderRepository.findByCarEntity(carEntity).orElse(null))
                 .filter(Objects::nonNull)
+                .filter(orderEntity -> orderEntity.getOrderStatus() == status)
                 .collect(Collectors.toList());
     }
 
