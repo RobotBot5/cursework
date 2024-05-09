@@ -16,4 +16,10 @@ public interface OrderService {
     List<OrderEntity> findByCurrentAutomechAndStatus(OrderStatus status);
 
     void updatePendingStatus(OrderEntity orderEntity);
+
+    void updateCarStatus(Long orderId, Boolean carReady);
+
+    void updateReadyStatus(Long orderId);
+
+    List<OrderEntity> findByCurrentAutomech();
 }

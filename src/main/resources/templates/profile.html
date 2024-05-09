@@ -155,6 +155,48 @@
         </table>
     </form>
 
+    <h1>Ваши записи</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Время</th>
+                <th>Номер заказа</th>
+                <th>Машина</th>
+                <th>Механик</th>
+                <th>Услуги</th>
+                <th>Время работы</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order, index : ${ordersWaitingCar}">
+            <td th:text="${#temporals.format(clientOrdersSlots[__${index.index}__].day, 'dd.MM')}"></td>
+            <td th:text="${#temporals.format(clientOrdersSlots[__${index.index}__].startTime, 'HH:mm')}"></td>
+            <td th:text="${order.id}"></td>
+            <td th:text="${order.carEntity.make + ' ' + order.carEntity.bodyType + ' ' + order.carEntity.stateNumber}"></td>
+            <td th:text="${order.userEntity.name + ' (' + order.userEntity.phoneNumber + ')'}"></td>
+            <td>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Название услуги</th>
+                        <th>Цена</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="service : ${order.serviceEntity}">
+                        <td th:text="${service.name}"></td>
+                        <td th:text="${service.price}"></td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+            <td th:text="${order.workingTime}"></td>
+        </tr>
+        </tbody>
+    </table>
+
 
     <p>Хотите перейти к услугам? <a th:href="@{/client_services}">Услуги</a></p>
 

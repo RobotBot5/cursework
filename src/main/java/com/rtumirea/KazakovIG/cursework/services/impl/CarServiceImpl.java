@@ -73,4 +73,10 @@ public class CarServiceImpl implements CarService {
     public List<CarEntity> findCarsOfClient(UserEntity userEntity) {
         return carRepository.findAllByUserEntity(userEntity);
     }
+
+    @Override
+    public void updateCarStatus(CarEntity carEntity, Boolean carReady) {
+        carEntity.setCarReady(carReady);
+        carRepository.save(carEntity);
+    }
 }

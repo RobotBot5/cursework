@@ -3,7 +3,6 @@ package com.rtumirea.KazakovIG.cursework.services;
 import com.rtumirea.KazakovIG.cursework.domain.entities.ScheduleEntity;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ScheduleService {
@@ -12,4 +11,8 @@ public interface ScheduleService {
     List<ScheduleEntity> getFreeSlots();
 
     void bookSlot(Long slotId, Long orderId);
+
+    List<ScheduleEntity> getCurrentClientsSlots();
+
+    List<ScheduleEntity> getCurrentAutomechSlots();
 }

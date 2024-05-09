@@ -1,10 +1,13 @@
 package com.rtumirea.KazakovIG.cursework.controllers;
 
+import com.rtumirea.KazakovIG.cursework.domain.dto.ScheduleDto;
 import com.rtumirea.KazakovIG.cursework.domain.dto.order.OrderDtoTo;
 import com.rtumirea.KazakovIG.cursework.domain.entities.OrderEntity;
+import com.rtumirea.KazakovIG.cursework.domain.entities.ScheduleEntity;
 import com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
 import com.rtumirea.KazakovIG.cursework.services.OrderService;
+import com.rtumirea.KazakovIG.cursework.services.ScheduleService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,10 +26,18 @@ public class AutomechOrdersController {
 
     private Mapper<OrderEntity, OrderDtoTo> orderMapperTo;
 
+    private ScheduleService scheduleService;
+
+    private Mapper<ScheduleEntity, ScheduleDto> scheduleMapper;
+
     public AutomechOrdersController(OrderService orderService,
-                                    Mapper<OrderEntity, OrderDtoTo> orderMapperTo) {
+                                    Mapper<OrderEntity, OrderDtoTo> orderMapperTo,
+                                    ScheduleService scheduleService,
+                                    Mapper<ScheduleEntity, ScheduleDto> scheduleMapper) {
         this.orderService = orderService;
         this.orderMapperTo = orderMapperTo;
+        this.scheduleService = scheduleService;
+        this.scheduleMapper = scheduleMapper;
     }
 
     @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
@@ -37,6 +48,13 @@ public class AutomechOrdersController {
                 .stream().map(orderMapperTo::mapTo)
                 .collect(Collectors.toList());
         model.addAttribute("orders", automechOrdersDto);
+
+        List<ScheduleEntity> automechSlotsEntities = scheduleService.getCurrentAutomechSlots();
+        List<ScheduleDto> automechSlotsDto = automechSlotsEntities
+                .stream().map(scheduleMapper::mapTo)
+                .collect(Collectors.toList());
+
+        model.addAttribute("automechSlots", automechSlotsDto);
 
         return "automech_orders";
     }
@@ -49,6 +67,30 @@ public class AutomechOrdersController {
         OrderEntity orderEntity = orderMapperTo.mapFrom(orderDto);
         orderService.updatePendingStatus(orderEntity);
 
+
+        return "redirect:/automech/orders";
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
+    @PostMapping(path = "/automech/orders/car-ready")
+    public String updateCarReady(@RequestParam(name = "carReady") Long orderId) {
+        orderService.updateCarStatus(orderId, true);
+
+        return "redirect:/automech/orders";
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
+    @PostMapping(path = "/automech/orders/car-unready")
+    public String updateCarUnReady(@RequestParam(name = "carReady") Long orderId) {
+        orderService.updateCarStatus(orderId, false);
+
+        return "redirect:/automech/orders";
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
+    @PostMapping(path = "/automech/orders/order-ready")
+    public String updateOrderReady(@RequestParam(name = "orderReady") Long orderId) {
+        orderService.updateReadyStatus(orderId);
 
         return "redirect:/automech/orders";
     }

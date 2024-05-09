@@ -18,4 +18,8 @@ public interface OrderRepository extends CrudRepository<OrderEntity, Long> {
     Optional<OrderEntity> findByCarEntity(CarEntity carEntity);
 
     List<OrderEntity> findAllByUserEntityAndOrderStatus(UserEntity userEntity, OrderStatus status);
+
+    List<OrderEntity> findAllByUserEntityAndOrderStatusOrOrderStatus(UserEntity userEntity, OrderStatus status1, OrderStatus status2);
+
+    List<OrderEntity> findAllByUserEntity(UserEntity userEntity);
 }

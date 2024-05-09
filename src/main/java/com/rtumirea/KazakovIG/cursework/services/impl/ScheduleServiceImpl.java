@@ -6,15 +6,13 @@ import com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus;
 import com.rtumirea.KazakovIG.cursework.domain.enums.ScheduleStatus;
 import com.rtumirea.KazakovIG.cursework.repositories.OrderRepository;
 import com.rtumirea.KazakovIG.cursework.repositories.ScheduleRepository;
+import com.rtumirea.KazakovIG.cursework.services.OrderService;
 import com.rtumirea.KazakovIG.cursework.services.ScheduleService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,9 +22,12 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private OrderRepository orderRepository;
 
-    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, OrderRepository orderRepository) {
+    private OrderService orderService;
+
+    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, OrderRepository orderRepository, OrderService orderService) {
         this.scheduleRepository = scheduleRepository;
         this.orderRepository = orderRepository;
+        this.orderService = orderService;
     }
 
     @Override
@@ -73,5 +74,22 @@ public class ScheduleServiceImpl implements ScheduleService {
         scheduleEntity.setStatus(ScheduleStatus.BOOKED);
         scheduleEntity.setOrderEntity(orderEntity);
         scheduleRepository.save(scheduleEntity);
+    }
+
+    @Override
+    public List<ScheduleEntity> getCurrentClientsSlots() {
+        List<OrderEntity> orderEntities = orderService.findByCurrentClientAndStatus(OrderStatus.AWAITING_CAR);
+        return orderEntities.stream()
+                .map(orderEntity -> scheduleRepository.findByOrderEntity(orderEntity).get())
+                .collect(Collectors.toList());
+
+    }
+
+    @Override
+    public List<ScheduleEntity> getCurrentAutomechSlots() {
+        List<OrderEntity> orderEntities = orderService.findByCurrentAutomech();
+        return orderEntities.stream()
+                .map(orderEntity -> scheduleRepository.findByOrderEntity(orderEntity).get())
+                .collect(Collectors.toList());
     }
 }

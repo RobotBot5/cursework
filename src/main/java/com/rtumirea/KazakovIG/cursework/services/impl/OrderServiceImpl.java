@@ -63,6 +63,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<OrderEntity> findByCurrentAutomech() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userPhoneNumber = authentication.getName();
+        Optional<UserEntity> userEntity = userService.findByPhoneNumber(userPhoneNumber);
+        return orderRepository.findAllByUserEntity(userEntity.get());
+    }
+
+    @Override
     public void updatePendingStatus(OrderEntity orderEntity) {
         orderRepository.findById(orderEntity.getId()).map(existingOrder -> {
             Optional.ofNullable(orderEntity.getDetailsWaiting()).ifPresent(existingOrder::setDetailsWaiting);
@@ -70,5 +78,23 @@ public class OrderServiceImpl implements OrderService {
             Optional.ofNullable(orderEntity.getOrderStatus()).ifPresent(existingOrder::setOrderStatus);
             return orderRepository.save(existingOrder);
         }).orElseThrow(() -> new RuntimeException("Order does not exist"));
+    }
+
+    @Override
+    public void updateCarStatus(Long orderId, Boolean carReady) {
+        OrderEntity orderEntity = orderRepository.findById(orderId).get();
+        carService.updateCarStatus(orderEntity.getCarEntity(), carReady);
+        if(carReady)
+            orderEntity.setOrderStatus(OrderStatus.IN_PROGRESS);
+        else
+            orderEntity.setOrderStatus(OrderStatus.AWAITING_CAR);
+        orderRepository.save(orderEntity);
+    }
+
+    @Override
+    public void updateReadyStatus(Long orderId) {
+        OrderEntity orderEntity = orderRepository.findById(orderId).get();
+        orderEntity.setOrderStatus(OrderStatus.COMPLETED);
+        orderRepository.save(orderEntity);
     }
 }

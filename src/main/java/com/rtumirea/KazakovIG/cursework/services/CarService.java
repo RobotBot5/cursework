@@ -19,4 +19,6 @@ public interface CarService {
     List<CarEntity> findCurrentUserCarsWithoutOrders();
 
     List<CarEntity> findCarsOfClient(UserEntity userEntity);
+
+    void updateCarStatus(CarEntity carEntity, Boolean carReady);
 }

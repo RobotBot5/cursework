@@ -26,4 +26,5 @@ public class CarDto {
 
     private UserEntity userEntity;
 
+    private Boolean carReady = false;
 }

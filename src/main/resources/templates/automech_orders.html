@@ -49,6 +49,61 @@
         </table>
     </form>
 </div>
+
+<h1>Предстоящие записи</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Дата</th>
+        <th>Время</th>
+        <th>Номер заказа</th>
+        <th>Машина</th>
+        <th>Клиент</th>
+        <th>Услуги</th>
+        <th>Время работы</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="slot : ${automechSlots}">
+        <td th:text="${#temporals.format(slot.day, 'dd.MM')}"></td>
+        <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
+        <td th:text="${slot.orderEntity.id}"></td>
+        <td th:text="${slot.orderEntity.carEntity.make + ' ' + slot.orderEntity.carEntity.bodyType + ' ' + slot.orderEntity.carEntity.stateNumber}"></td>
+        <td th:text="${slot.orderEntity.carEntity.userEntity.name + ' (' + slot.orderEntity.carEntity.userEntity.phoneNumber + ')'}"></td>
+        <td>
+            <table>
+                <thead>
+                <tr>
+                    <th>Название услуги</th>
+                    <th>Цена</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="service : ${slot.orderEntity.serviceEntity}">
+                    <td th:text="${service.name}"></td>
+                    <td th:text="${service.price}"></td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+        <td th:text="${slot.orderEntity.workingTime}"></td>
+        <td>
+            <form th:action="@{/automech/orders/car-ready}" method="POST" th:if="${!slot.orderEntity.carEntity.carReady}">
+                <button type="submit" name="carReady" th:value="${slot.orderEntity.id}">Клиент привез машину</button>
+            </form>
+            <form th:action="@{/automech/orders/car-unready}" method="POST" th:if="${slot.orderEntity.carEntity.carReady}">
+                <button type="submit" name="carReady" th:value="${slot.orderEntity.id}">Клиент увез машину</button>
+            </form>
+        </td>
+        <td th:if="${slot.orderEntity.carEntity.carReady}">
+            <form th:action="@{/automech/orders/order-ready}" method="POST">
+                <button type="submit" name="orderReady" th:value="${slot.orderEntity.id}">Заказ готов</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
 <script th:inline="javascript">
     function toggleDisabled(index) {
         // Получаем чекбокс
