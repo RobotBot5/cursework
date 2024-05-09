@@ -11,7 +11,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Controller
 public class LoginController {
@@ -38,8 +40,9 @@ public class LoginController {
 //        userService.addAutoMech("1", "Алексей", "1");
 //        userService.addAutoMech("2", "Дмитрий", "1");
 //        userService.addAutoMech("3", "Владислав", "1");
-        scheduleService.generateSchedule(LocalDateTime.of(2024, 5, 1, 9, 0),
-                LocalDateTime.of(2024, 5, 31, 21, 0), 120);
+        scheduleService.generateSchedule(LocalDate.of(2024, 5, 1),
+                LocalDate.of(2024, 5, 31),
+                120);
 
 
 

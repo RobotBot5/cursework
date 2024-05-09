@@ -87,6 +87,35 @@
         </tbody>
     </table>
 
+    <select id="daySelector">
+        <option th:each="freeSlotDay : ${freeSlotsDays}" th:text="${#temporals.format(freeSlotDay, 'dd.MM')}" th:value="${freeSlotDay}"></option>
+    </select>
+
+    <h1>Free Slots</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody id="freeSlots">
+        <tr th:each="slot : ${freeSlots}" th:class="${slot.day} + ' schedule'">
+            <td th:text="${#temporals.format(slot.day, 'dd.MM')}"></td>
+            <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
+            <td>
+                <form th:action="@{/bookSlot}" method="post">
+                    <input type="hidden" th:name="slotId" th:value="${slot.id}"/>
+                    <button type="submit">Book</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p>Хотите перейти к услугам? <a th:href="@{/client_services}">Услуги</a></p>
+
     <script th:inline="javascript">
         (() => {
             const dynamicSelect = (id1, id2) => {
@@ -129,12 +158,32 @@
                 sel2.dispatchEvent(event);
             };
 
+            const filterByDay = (id) => {
+                const elementSelectedDay = document.getElementById(id);
+                const selectedDay =  elementSelectedDay.options[elementSelectedDay.selectedIndex].value;
+                const rows = document.getElementsByClassName("schedule");
+
+                // Проходимся по всем строкам
+                for (let i = 0; i < rows.length; i++) {
+                    // Если строка не имеет нужный класс, скрываем ее
+                    if (!rows[i].classList.contains(selectedDay)) {
+                        rows[i].style.display = "none";
+                    }
+                    else {
+                        rows[i].style.display = "block";
+                    }
+                }
+                elementSelectedDay.addEventListener('change', () => {
+                    filterByDay(id);
+                });
+            }
+
             // Вызов скрипта при загрузке страницы
             document.addEventListener("DOMContentLoaded", () => {
                 dynamicSelect("make", "bodyType");
+                filterByDay("daySelector");
             });
         })();
     </script>
-    <p>Хотите перейти к услугам? <a th:href="@{/client_services}">Услуги</a></p>
 </body>
 </html>

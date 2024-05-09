@@ -1,15 +1,14 @@
 package com.rtumirea.KazakovIG.cursework.controllers;
 
 import com.rtumirea.KazakovIG.cursework.domain.dto.CarDto;
+import com.rtumirea.KazakovIG.cursework.domain.dto.ScheduleDto;
 import com.rtumirea.KazakovIG.cursework.domain.dto.UserDto;
 import com.rtumirea.KazakovIG.cursework.domain.dto.order.OrderDtoTo;
-import com.rtumirea.KazakovIG.cursework.domain.entities.CarEntity;
-import com.rtumirea.KazakovIG.cursework.domain.entities.OrderEntity;
-import com.rtumirea.KazakovIG.cursework.domain.entities.ServiceEntity;
-import com.rtumirea.KazakovIG.cursework.domain.entities.UserEntity;
+import com.rtumirea.KazakovIG.cursework.domain.entities.*;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
 import com.rtumirea.KazakovIG.cursework.services.CarService;
 import com.rtumirea.KazakovIG.cursework.services.OrderService;
+import com.rtumirea.KazakovIG.cursework.services.ScheduleService;
 import com.rtumirea.KazakovIG.cursework.services.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,16 +39,24 @@ public class CarController {
 
     private Mapper<OrderEntity, OrderDtoTo> orderMapperTo;
 
+    private ScheduleService scheduleService;
+
+    private Mapper<ScheduleEntity, ScheduleDto> scheduleMapper;
+
     public CarController(CarService carService, Mapper<CarEntity,
             CarDto> carMapper, UserService userService,
                          Mapper<UserEntity, UserDto> userMapper, OrderService orderService,
-                         Mapper<OrderEntity, OrderDtoTo> orderMapperTo) {
+                         Mapper<OrderEntity, OrderDtoTo> orderMapperTo,
+                         ScheduleService scheduleService,
+                         Mapper<ScheduleEntity, ScheduleDto> scheduleMapper) {
         this.carService = carService;
         this.carMapper = carMapper;
         this.userService = userService;
         this.userMapper = userMapper;
         this.orderService = orderService;
         this.orderMapperTo = orderMapperTo;
+        this.scheduleService = scheduleService;
+        this.scheduleMapper = scheduleMapper;
     }
 
     @PreAuthorize("hasAuthority('ROLE_CLIENT')")
@@ -83,6 +91,13 @@ public class CarController {
         model.addAttribute("totals", totalPrices);
 
         model.addAttribute("statusesTypeNames", getStatusesTypeNames());
+
+        List<ScheduleEntity> freeSlots = scheduleService.getFreeSlots();
+        model.addAttribute("freeSlots", freeSlots);
+        Set<LocalDate> freeSlotsDays = freeSlots.stream()
+                .map(ScheduleEntity::getDay)
+                .collect(Collectors.toSet());
+        model.addAttribute("freeSlotsDays", freeSlotsDays);
         return "profile";
     }
 

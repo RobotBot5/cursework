@@ -6,10 +6,12 @@ import com.rtumirea.KazakovIG.cursework.repositories.ScheduleRepository;
 import com.rtumirea.KazakovIG.cursework.services.ScheduleService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
@@ -21,23 +23,37 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public void generateSchedule(LocalDateTime startDate, LocalDateTime endDate, int intervalInMinutes) {
-        LocalDateTime currentDateTime = startDate;
+    public void generateSchedule(LocalDate startDate, LocalDate endDate, int intervalInMinutes) {
+        LocalDate currentDate = startDate;
 
         LocalTime workStartTime = LocalTime.of(9, 0); // 9:00 утра
         LocalTime workEndTime = LocalTime.of(21, 0); // 9:00 вечера
 
-        while (currentDateTime.isBefore(endDate)) {
-            if ((currentDateTime.toLocalTime().isAfter(workStartTime) || currentDateTime.toLocalTime().equals(workStartTime))
-                    && (currentDateTime.toLocalTime().isBefore(workEndTime))) {
+        LocalTime currentTime = workStartTime;
+
+        while (currentDate.isBefore(endDate.plusDays(1))) {
+            if (currentTime.isBefore(workEndTime)) {
                 scheduleRepository.save(ScheduleEntity.builder()
-                        .startTime(currentDateTime)
-                        .endTime(currentDateTime.plusMinutes(intervalInMinutes))
+                        .day(currentDate)
+                        .startTime(currentTime)
+                        .endTime(currentTime.plusMinutes(intervalInMinutes))
                         .status(ScheduleStatus.FREE)
                         .build());
+                currentTime = currentTime.plusMinutes(intervalInMinutes);
             }
-
-            currentDateTime = currentDateTime.plusMinutes(intervalInMinutes);
+            else {
+                currentTime = workStartTime;
+                currentDate = currentDate.plusDays(1);
+            }
         }
+    }
+
+    @Override
+    public List<ScheduleEntity> getFreeSlots() {
+        List<ScheduleEntity> scheduleEntities = scheduleRepository.findAllByStatus(ScheduleStatus.FREE);
+        return scheduleEntities.stream()
+                .filter(scheduleEntity ->
+                        scheduleEntity.getDay().isAfter(LocalDate.now()))
+                .collect(Collectors.toList());
     }
 }
