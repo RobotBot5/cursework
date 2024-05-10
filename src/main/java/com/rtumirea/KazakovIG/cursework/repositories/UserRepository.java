@@ -11,6 +11,8 @@ public interface UserRepository extends CrudRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByPhoneNumber(String phoneNumber);
 
+    List<UserEntity> findAllByRoles(String role);
+
     @Query("SELECT u FROM UserEntity u WHERE u.roles = 'ROLE_AUTOMECH' AND u.ordersNum = (SELECT MIN(u2.ordersNum) FROM UserEntity u2 WHERE u2.roles = 'ROLE_AUTOMECH')")
     List<UserEntity> findAutoMechsWithMinOrdersNum();
 }

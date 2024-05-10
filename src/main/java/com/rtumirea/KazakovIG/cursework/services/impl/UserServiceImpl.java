@@ -6,6 +6,7 @@ import com.rtumirea.KazakovIG.cursework.services.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -62,5 +63,30 @@ public class UserServiceImpl implements UserService {
                         .roles("ROLE_AUTOMECH")
                         .ordersNum(0)
                 .build());
+    }
+
+    @Override
+    public void createAdmin(String password) {
+        userRepository.save(UserEntity.builder()
+                        .phoneNumber("admin")
+                        .name("Администратор")
+                        .password(passwordEncoder.encode(password))
+                        .roles("ROLE_ADMIN")
+                .build());
+    }
+
+    @Override
+    public List<UserEntity> getAutomechs() {
+        return userRepository.findAllByRoles("ROLE_AUTOMECH");
+    }
+
+    @Override
+    public Optional<UserEntity> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
     }
 }

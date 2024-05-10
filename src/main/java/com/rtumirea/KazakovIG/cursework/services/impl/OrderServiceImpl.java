@@ -80,6 +80,24 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public void deleteAutomechById(Long id) {
+        List<OrderEntity> allOrdersOfAutomech = orderRepository.findAllByUserEntity(userService.findById(id).get());
+        allOrdersOfAutomech.forEach(orderEntity -> orderEntity.setUserEntity(null));
+        userService.deleteById(id);
+        allOrdersOfAutomech.forEach(orderEntity -> {
+            UserEntity autoMechWithMinOrdersNum = userService.findAutoMechWithMinOrdersNum().get();
+            orderEntity.setUserEntity(autoMechWithMinOrdersNum);
+            userService.incrementOrderNum(autoMechWithMinOrdersNum);
+        });
+        orderRepository.saveAll(allOrdersOfAutomech);
+    }
+
+    @Override
+    public Optional<OrderEntity> findById(Long orderId) {
+        return orderRepository.findById(orderId);
+    }
+
+    @Override
     public void updatePendingStatus(OrderEntity orderEntity) {
         orderRepository.findById(orderEntity.getId()).map(existingOrder -> {
             Optional.ofNullable(orderEntity.getDetailsWaiting()).ifPresent(existingOrder::setDetailsWaiting);
@@ -106,4 +124,6 @@ public class OrderServiceImpl implements OrderService {
         orderEntity.setOrderStatus(OrderStatus.COMPLETED);
         orderRepository.save(orderEntity);
     }
+
+
 }

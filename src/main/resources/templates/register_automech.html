@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Автосервис</title>
+</head>
+<body>
+<h1>Список механиков</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Номер телефона</th>
+            <th>Имя</th>
+            <th>Кол-во заказов</th>
+        </tr>
+    </thead>
+    <tbody>
+    <tr th:each="automech : ${automechs}">
+        <td th:text="${automech.id}"></td>
+        <td th:text="${automech.phoneNumber}"></td>
+        <td th:text="${automech.name}"></td>
+        <td th:text="${automech.ordersNum}"></td>
+    </tr>
+    </tbody>
+</table>
+<h1>Регистрация механика</h1>
+<form action="#" th:action="@{/new-automech}" th:object="${user}" method="POST">
+    <input type="text" th:field="*{phoneNumber}" placeholder="Введите Ваш номер телефона">
+    <input type="text" th:field="*{name}" placeholder="Введите Ваше имя">
+    <input type="text" th:field="*{password}" placeholder="Введите пароль">
+    <div th:if="${error}" style="color: red;" th:text="${error}"></div>
+    <button type="submit">Зарегистрироваться</button>
+</form>
+<h1>Удаление механика</h1>
+<form action="#" th:action="@{/admin/automechs/delete-automech}" method="POST">
+    <select name="deletableAutomechId">
+        <option th:each="automech : ${automechs}" th:text="'Id:' + ${automech.id}" th:value="${automech.id}"></option>
+    </select>
+    <button type="submit">Удалить механика</button>
+</form>
+</body>
+</html>

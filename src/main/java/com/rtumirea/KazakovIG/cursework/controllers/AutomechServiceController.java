@@ -30,8 +30,8 @@ public class AutomechServiceController {
         this.serviceMapper = serviceMapper;
     }
 
-    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
-    @GetMapping(path = "/automech_services")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping(path = "/admin/services")
     public String listServices(Model model) {
         List<ServiceEntity> serviceEntities = serviceService.findAll();
         Map<ServiceType, List<ServiceEntity>> servicesByType = serviceEntities.stream()
@@ -61,7 +61,7 @@ public class AutomechServiceController {
         return serviceTypeNames;
     }
 
-    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping(path = "/automech_services/new-service")
     public String createService(@ModelAttribute("service") ServiceDto serviceDto, RedirectAttributes redirectAttributes) {
 
@@ -75,14 +75,14 @@ public class AutomechServiceController {
         return "redirect:/automech_services";
     }
 
-    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping(path = "/automech_services/delete-service")
     public String deleteService(@RequestParam("deletable_service_name") String deletable_service_name) {
         serviceService.delete(deletable_service_name);
         return "redirect:/automech_services";
     }
 
-    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping(path = "/automech_services/update-cost")
     public String updateCostServiceByName(
             @RequestParam("updatable_service_name") String updatable_service_name,

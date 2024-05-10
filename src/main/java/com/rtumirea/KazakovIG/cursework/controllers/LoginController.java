@@ -43,6 +43,7 @@ public class LoginController {
 //        scheduleService.generateSchedule(LocalDate.of(2024, 5, 1),
 //                LocalDate.of(2024, 5, 31),
 //                120);
+//        userService.createAdmin("admin");
 
 
 

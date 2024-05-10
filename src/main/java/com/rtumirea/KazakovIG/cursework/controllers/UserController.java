@@ -7,6 +7,7 @@ import com.rtumirea.KazakovIG.cursework.services.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.java.Log;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -43,5 +44,20 @@ public class UserController {
             log.warning("Error while login " + e);
         }
         return "redirect:/profile";
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping(path = "/new-automech")
+    public String addAutomech(@ModelAttribute("user") UserDto userDto, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+        if(userService.isUserExists(userDto.getPhoneNumber())) {
+            redirectAttributes.addFlashAttribute("error", "Номер телефона уже зарегистрирован");
+            return "redirect:/admin/automechs";
+        }
+
+        userDto.setRoles("ROLE_AUTOMECH");
+        userDto.setOrdersNum(0);
+        UserEntity userEntity = userMapper.mapFrom(userDto);
+        userService.addUser(userEntity);
+        return "redirect:/admin/automechs";
     }
 }

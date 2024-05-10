@@ -8,6 +8,7 @@ import com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
 import com.rtumirea.KazakovIG.cursework.services.OrderService;
 import com.rtumirea.KazakovIG.cursework.services.ScheduleService;
+import com.rtumirea.KazakovIG.cursework.services.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,14 +31,18 @@ public class AutomechOrdersController {
 
     private Mapper<ScheduleEntity, ScheduleDto> scheduleMapper;
 
+    private UserService userService;
+
     public AutomechOrdersController(OrderService orderService,
                                     Mapper<OrderEntity, OrderDtoTo> orderMapperTo,
                                     ScheduleService scheduleService,
-                                    Mapper<ScheduleEntity, ScheduleDto> scheduleMapper) {
+                                    Mapper<ScheduleEntity, ScheduleDto> scheduleMapper,
+                                    UserService userService) {
         this.orderService = orderService;
         this.orderMapperTo = orderMapperTo;
         this.scheduleService = scheduleService;
         this.scheduleMapper = scheduleMapper;
+        this.userService = userService;
     }
 
     @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
@@ -99,7 +104,7 @@ public class AutomechOrdersController {
     @PostMapping(path = "/automech/orders/delete-order")
     public String deleteCompletedOrder(@RequestParam(name = "deleteOrder") Long orderId) {
         scheduleService.deleteBookedOrder(orderId);
-
+        userService.decrementOrderNum(orderService.findById(orderId).get().getUserEntity());
         return "redirect:/automech/orders";
     }
 }
