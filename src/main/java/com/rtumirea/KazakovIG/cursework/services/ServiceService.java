@@ -17,4 +17,10 @@ public interface ServiceService {
     void updatePriceByName(String name, int price);
 
     Optional<ServiceEntity> findById(Long id);
+
+    void prepareToDelete(String deletableServiceName);
+
+    void deleteFinally(Long serviceId);
+
+    void undelete(Long serviceId);
 }

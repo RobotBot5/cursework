@@ -15,7 +15,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="service : ${entry.value}">
+            <tr th:each="service : ${entry.value}" th:if="${!service.deletable}">
                 <td th:text="${service.name}"></td>
                 <td th:text="${service.price}"></td>
             </tr>

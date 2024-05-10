@@ -55,4 +55,23 @@ public class ServiceServiceImpl implements ServiceService {
     public Optional<ServiceEntity> findById(Long id) {
         return serviceRepository.findById(id);
     }
+
+    @Override
+    public void prepareToDelete(String deletableServiceName) {
+        ServiceEntity serviceEntity = serviceRepository.findByName(deletableServiceName).get();
+        serviceEntity.setDeletable(true);
+        serviceRepository.save(serviceEntity);
+    }
+
+    @Override
+    public void deleteFinally(Long serviceId) {
+        serviceRepository.deleteById(serviceId);
+    }
+
+    @Override
+    public void undelete(Long serviceId) {
+        ServiceEntity serviceEntity = serviceRepository.findById(serviceId).get();
+        serviceEntity.setDeletable(false);
+        serviceRepository.save(serviceEntity);
+    }
 }

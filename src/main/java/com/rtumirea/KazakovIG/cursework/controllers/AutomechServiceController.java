@@ -67,19 +67,19 @@ public class AutomechServiceController {
 
         if(serviceService.isServiceNameExists(serviceDto.getName())) {
             redirectAttributes.addFlashAttribute("error", "Такое название услуги уже существует");
-            return "redirect:/automech_services";
+            return "redirect:/admin/services";
         }
 
         ServiceEntity serviceEntity = serviceMapper.mapFrom(serviceDto);
         serviceService.save(serviceEntity);
-        return "redirect:/automech_services";
+        return "redirect:/admin/services";
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping(path = "/automech_services/delete-service")
     public String deleteService(@RequestParam("deletable_service_name") String deletable_service_name) {
-        serviceService.delete(deletable_service_name);
-        return "redirect:/automech_services";
+        serviceService.prepareToDelete(deletable_service_name);
+        return "redirect:/admin/services";
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -89,9 +89,9 @@ public class AutomechServiceController {
             @RequestParam("updatable_service_price") int updatable_service_price) {
         if(!serviceService.isServiceNameExists(updatable_service_name)) {
             log.warning("Can't find service in updateCostServiceByName: " + updatable_service_name);
-            return "redirect:/automech_services";
+            return "redirect:/admin/services";
         }
         serviceService.updatePriceByName(updatable_service_name, updatable_service_price);
-        return "redirect:/automech_services";
+        return "redirect:/admin/services";
     }
 }

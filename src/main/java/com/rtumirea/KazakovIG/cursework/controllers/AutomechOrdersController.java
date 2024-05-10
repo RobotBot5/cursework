@@ -103,8 +103,8 @@ public class AutomechOrdersController {
     @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
     @PostMapping(path = "/automech/orders/delete-order")
     public String deleteCompletedOrder(@RequestParam(name = "deleteOrder") Long orderId) {
-        scheduleService.deleteBookedOrder(orderId);
         userService.decrementOrderNum(orderService.findById(orderId).get().getUserEntity());
+        scheduleService.deleteBookedOrder(orderId);
         return "redirect:/automech/orders";
     }
 }

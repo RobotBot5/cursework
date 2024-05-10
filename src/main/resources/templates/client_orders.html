@@ -12,7 +12,7 @@
         </select>
         <ul th:each="entry : ${servicesByType}">
             <p th:text="${serviceTypeNames[__${entry.key}__]}"></p>
-            <li th:each="service : ${entry.value}">
+            <li th:each="service : ${entry.value}" th:if="${!service.deletable}">
                 <input type="checkbox" th:field="*{serviceIds}" th:value="${service.id}" th:attr="data-price=${service.price}" />
                 <label th:for="${#ids.prev('serviceIds')}"
                        th:text="${service.name}"></label>

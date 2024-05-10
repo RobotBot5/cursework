@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Log
 @Service
@@ -95,6 +96,15 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Optional<OrderEntity> findById(Long orderId) {
         return orderRepository.findById(orderId);
+    }
+
+    @Override
+    public List<OrderEntity> findAll() {
+        return StreamSupport.stream(orderRepository
+                .findAll()
+                .spliterator(),
+                false)
+                .collect(Collectors.toList());
     }
 
     @Override

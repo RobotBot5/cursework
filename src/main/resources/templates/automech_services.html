@@ -28,6 +28,7 @@
     </select>
     <button type="submit">Удалить сервис</button>
 </form>
+<div th:if="${error_delete}" style="color: red;" th:text="${error_delete}"></div>
 
 <form action="#" th:action="@{/automech_services/update-cost}" method="POST">
     <select name="updatable_service_name">
@@ -54,8 +55,19 @@
         </thead>
         <tbody>
         <tr th:each="service : ${entry.value}">
-            <td th:text="${service.name}"></td>
-            <td th:text="${service.price}"></td>
+            <td>
+                <span th:if="${service.deletable}">
+                    <s th:text="${service.name}"></s>
+                </span>
+                <span th:unless="${service.deletable}" th:text="${service.name}"></span>
+                <form th:if="${service.deletable}" th:action="@{/admin/services/delete-finally}" method="POST">
+                    <button type="submit" name="finallyDeletableServiceId" th:value="${service.id}">Окончательно удалить услугу</button>
+                </form>
+                <form th:if="${service.deletable}" th:action="@{/admin/services/undelete-service}" method="POST">
+                    <button type="submit" name="unDeleteServiceId" th:value="${service.id}">Отменить удаление</button>
+                </form>
+            </td>
+            <td th:text="${service.price}"><s th:if="${service.deletable}"></s></td>
         </tr>
         </tbody>
     </table>

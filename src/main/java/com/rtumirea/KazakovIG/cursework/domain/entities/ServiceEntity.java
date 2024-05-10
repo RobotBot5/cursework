@@ -28,4 +28,5 @@ public class ServiceEntity {
 
     private Integer price;
 
+    private Boolean deletable = false;
 }

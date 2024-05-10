@@ -20,4 +20,5 @@ public class ServiceDto {
 
     private Integer price;
 
+    private Boolean deletable = false;
 }

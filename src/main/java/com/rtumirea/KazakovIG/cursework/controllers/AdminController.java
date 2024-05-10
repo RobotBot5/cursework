@@ -1,9 +1,11 @@
 package com.rtumirea.KazakovIG.cursework.controllers;
 
 import com.rtumirea.KazakovIG.cursework.domain.dto.UserDto;
+import com.rtumirea.KazakovIG.cursework.domain.entities.OrderEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.UserEntity;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
 import com.rtumirea.KazakovIG.cursework.services.OrderService;
+import com.rtumirea.KazakovIG.cursework.services.ServiceService;
 import com.rtumirea.KazakovIG.cursework.services.UserService;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,10 +28,14 @@ public class AdminController {
 
     private OrderService orderService;
 
-    public AdminController(UserService userService, Mapper<UserEntity, UserDto> userMapper, OrderService orderService) {
+    private ServiceService serviceService;
+
+    public AdminController(UserService userService, Mapper<UserEntity, UserDto> userMapper, OrderService orderService,
+                           ServiceService serviceService) {
         this.userService = userService;
         this.userMapper = userMapper;
         this.orderService = orderService;
+        this.serviceService = serviceService;
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
@@ -46,5 +53,32 @@ public class AdminController {
     public String deleteAutomech(@RequestParam(name = "deletableAutomechId") Long automechId) {
         orderService.deleteAutomechById(automechId);
         return "redirect:/admin/automechs";
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping(path = "/admin/services/delete-finally")
+    public String deleteFinallyService(@RequestParam(name = "finallyDeletableServiceId") Long serviceId,
+                                       RedirectAttributes redirectAttributes) {
+        List<OrderEntity> allOrders = orderService.findAll();
+
+        if(allOrders.stream()
+                .anyMatch(orderEntity -> orderEntity.getServiceEntity().stream()
+                        .anyMatch(serviceEntity -> serviceEntity.getId().equals(serviceId))))
+        {
+            redirectAttributes.addFlashAttribute("error_delete", "Заказы с такой услугой еще есть");
+            return "redirect:/admin/services";
+        }
+
+        serviceService.deleteFinally(serviceId);
+
+        return "redirect:/admin/services";
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping(path = "/admin/services/undelete-service")
+    public String deleteFinallyService(@RequestParam(name = "unDeleteServiceId") Long serviceId) {
+        serviceService.undelete(serviceId);
+
+        return "redirect:/admin/services";
     }
 }

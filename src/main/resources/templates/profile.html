@@ -47,7 +47,7 @@
         <button type="submit">Добавить</button>
     </form>
     <p> <a th:href="@{/profile/orders}">Оформить новый заказ</a></p>
-
+    <p>Хотите посмотреть услуги? <a th:href="@{/client_services}">Услуги</a></p>
     <h1>Список заказов в обработке</h1>
     <table>
         <thead>
@@ -207,9 +207,6 @@
         </tr>
         </tbody>
     </table>
-
-
-    <p>Хотите перейти к услугам? <a th:href="@{/client_services}">Услуги</a></p>
 
     <script th:inline="javascript">
         (() => {
