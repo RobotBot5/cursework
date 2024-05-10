@@ -50,4 +50,9 @@ public class ServiceServiceImpl implements ServiceService {
             return serviceRepository.save(existingService);
         });
     }
+
+    @Override
+    public Optional<ServiceEntity> findById(Long id) {
+        return serviceRepository.findById(id);
+    }
 }

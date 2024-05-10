@@ -11,5 +11,11 @@ public interface UserService {
 
     Optional<UserEntity> findByPhoneNumber(String phoneNumber);
 
-    void createAutoMech(String name, String phoneNumber, String password);
+    Optional<UserEntity> findAutoMechWithMinOrdersNum();
+
+    void incrementOrderNum(UserEntity autoMechEntity);
+
+    void decrementOrderNum(UserEntity autoMechEntity);
+
+    void addAutoMech(String phoneNumber, String name, String password);
 }

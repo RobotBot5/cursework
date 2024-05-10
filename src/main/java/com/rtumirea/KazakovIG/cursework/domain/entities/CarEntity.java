@@ -41,6 +41,9 @@ public class CarEntity {
     @JoinColumn(name = "user_id")
     private UserEntity userEntity;
 
+    @Column(name = "car_ready")
+    private Boolean carReady = false;
+
     @AssertTrue(message = "Invalid body type for the specified make")
     public boolean isBodyTypeValidForMake() {
         if (make == CarMake.BMW) {

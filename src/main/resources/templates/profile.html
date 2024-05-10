@@ -24,6 +24,7 @@
                 <td th:text="${car.make}"></td>
                 <td th:text="${car.bodyType}"></td>
                 <td th:text="${car.year}"></td>
+                <td th:if="${car.carReady}">Машина в автосервисе</td>
             </tr>
         </tbody>
     </table>
@@ -33,7 +34,6 @@
             <option th:each="make : ${T(com.rtumirea.KazakovIG.cursework.domain.enums.CarMake).values()}"
                     th:value="${make}" th:text="${make}"></option>
         </select>
-<!--        TO-DO-->
         <select th:field="*{bodyType}" id="bodyType" name="bodyType">
             <option th:each="bmwBodyType : ${T(com.rtumirea.KazakovIG.cursework.domain.enums.BmwBodyType).values()}"
                     th:value="${bmwBodyType}" th:text="${bmwBodyType}" class="BMW">
@@ -46,8 +46,173 @@
         <input type="text" th:field="*{stateNumber}" placeholder="Введите ГосНомер машины">
         <button type="submit">Добавить</button>
     </form>
+    <p> <a th:href="@{/profile/orders}">Оформить новый заказ</a></p>
 
-    <script>
+    <h1>Список заказов в обработке</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Номер заказа</th>
+            <th>Машина</th>
+            <th>Механик</th>
+            <th>Услуги</th>
+            <th>Общая сумма</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order, index : ${ordersPending}">
+            <td th:text="${order.id}"></td>
+            <td th:text="${order.carEntity.make + ' ' + order.carEntity.bodyType + ' ' + order.carEntity.stateNumber}"></td>
+            <td th:text="${order.userEntity.name + ' (' + order.userEntity.phoneNumber + ')'}"></td>
+            <td>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Название услуги</th>
+                            <th>Цена</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="service : ${order.serviceEntity}">
+                            <td th:text="${service.name}"></td>
+                            <td th:text="${service.price}"></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+            <td th:text="${totals[__${index.index}__]}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h1>Список заказов, ожидающих записи</h1>
+    <form th:action="@{/profile/schedule/book}" method="post">
+        <table>
+            <thead>
+            <tr>
+                <th>Номер заказа</th>
+                <th>Машина</th>
+                <th>Механик</th>
+                <th>Услуги</th>
+                <th>Время работы</th>
+                <th>Время доставки деталей</th>
+                <th>Выбрать</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="order, index : ${ordersScheduling}">
+                <td th:text="${order.id}"></td>
+                <td th:text="${order.carEntity.make + ' ' + order.carEntity.bodyType + ' ' + order.carEntity.stateNumber}"></td>
+                <td th:text="${order.userEntity.name + ' (' + order.userEntity.phoneNumber + ')'}"></td>
+                <td>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Название услуги</th>
+                            <th>Цена</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="service : ${order.serviceEntity}">
+                            <td th:text="${service.name}"></td>
+                            <td th:text="${service.price}"></td>
+                            <td></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td>
+                <td th:text="${order.workingTime}"></td>
+                <td th:text="${order.detailsWaiting}"></td>
+                <td><input type="radio" name="scheduleOrderChoice" th:value="${order.id}" /></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h1>Выберете время</h1>
+
+        <select id="daySelector">
+            <option th:each="freeSlotDay : ${freeSlotsDays}" th:text="${#temporals.format(freeSlotDay, 'dd.MM')}" th:value="${freeSlotDay}"></option>
+        </select>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Время</th>
+                <th>Записаться</th>
+            </tr>
+            </thead>
+            <tbody id="freeSlots">
+            <tr th:each="slot : ${freeSlots}" th:class="${slot.day} + ' schedule'">
+                <td th:text="${#temporals.format(slot.day, 'dd.MM')}"></td>
+                <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
+                <td>
+                    <input type="hidden"/>
+                    <button th:name="slotId" th:value="${slot.id}" type="submit">Записаться</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+
+    <h1>Ваши записи</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Время</th>
+                <th>Номер заказа</th>
+                <th>Машина</th>
+                <th>Механик</th>
+                <th>Услуги</th>
+                <th>Время работы</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr th:each="slot : ${clientSlots}">
+            <td th:text="${#temporals.format(slot.day, 'dd.MM')}"></td>
+            <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
+            <td th:text="${slot.orderEntity.id}"></td>
+            <td th:text="${slot.orderEntity.carEntity.make + ' ' + slot.orderEntity.carEntity.bodyType + ' ' + slot.orderEntity.carEntity.stateNumber}"></td>
+            <td th:text="${slot.orderEntity.userEntity.name + ' (' + slot.orderEntity.userEntity.phoneNumber + ')'}"></td>
+            <td>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Название услуги</th>
+                        <th>Цена</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="service : ${slot.orderEntity.serviceEntity}">
+                        <td th:text="${service.name}"></td>
+                        <td th:text="${service.price}"></td>
+                        <td></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </td>
+            <td th:text="${slot.orderEntity.workingTime}"></td>
+            <td th:if="${slot.orderEntity.orderStatus==T(com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus).AWAITING_CAR}">
+                Можете привезти машину заранее, при свободном окне выполним заказ раньше!:)
+            </td>
+            <td th:if="${slot.orderEntity.orderStatus==T(com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus).IN_PROGRESS}">
+                В процессе
+            </td>
+            <td th:if="${slot.orderEntity.orderStatus==T(com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus).COMPLETED}">
+                Заказ готов, можете забрать машину
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+
+
+    <p>Хотите перейти к услугам? <a th:href="@{/client_services}">Услуги</a></p>
+
+    <script th:inline="javascript">
         (() => {
             const dynamicSelect = (id1, id2) => {
                 // Определение переменных, ссылающихся на списки
@@ -89,12 +254,32 @@
                 sel2.dispatchEvent(event);
             };
 
+            const filterByDay = (id) => {
+                const elementSelectedDay = document.getElementById(id);
+                const selectedDay =  elementSelectedDay.options[elementSelectedDay.selectedIndex].value;
+                const rows = document.getElementsByClassName("schedule");
+
+                // Проходимся по всем строкам
+                for (let i = 0; i < rows.length; i++) {
+                    // Если строка не имеет нужный класс, скрываем ее
+                    if (!rows[i].classList.contains(selectedDay)) {
+                        rows[i].style.display = "none";
+                    }
+                    else {
+                        rows[i].style.display = "block";
+                    }
+                }
+                elementSelectedDay.addEventListener('change', () => {
+                    filterByDay(id);
+                });
+            }
+
             // Вызов скрипта при загрузке страницы
             document.addEventListener("DOMContentLoaded", () => {
                 dynamicSelect("make", "bodyType");
+                filterByDay("daySelector");
             });
         })();
     </script>
-    <p>Хотите перейти к услугам? <a th:href="@{/client_services}">Услуги</a></p>
 </body>
 </html>

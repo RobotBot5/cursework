@@ -37,12 +37,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void createAutoMech(String name, String phoneNumber, String password) {
+    public Optional<UserEntity> findAutoMechWithMinOrdersNum() {
+        return userRepository.findAutoMechsWithMinOrdersNum().stream().findFirst();
+    }
+
+    @Override
+    public void incrementOrderNum(UserEntity autoMechEntity) {
+        autoMechEntity.setOrdersNum(autoMechEntity.getOrdersNum() + 1);
+        userRepository.save(autoMechEntity);
+    }
+
+    @Override
+    public void decrementOrderNum(UserEntity autoMechEntity) {
+        autoMechEntity.setOrdersNum(autoMechEntity.getOrdersNum() - 1);
+        userRepository.save(autoMechEntity);
+    }
+
+    @Override
+    public void addAutoMech(String phoneNumber, String name, String password) {
         userRepository.save(UserEntity.builder()
                         .phoneNumber(phoneNumber)
                         .name(name)
-                        .roles("ROLE_AUTOMECH")
                         .password(passwordEncoder.encode(password))
+                        .roles("ROLE_AUTOMECH")
+                        .ordersNum(0)
                 .build());
     }
 }

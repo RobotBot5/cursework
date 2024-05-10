@@ -4,19 +4,27 @@ import com.rtumirea.KazakovIG.cursework.domain.dto.UserDto;
 import com.rtumirea.KazakovIG.cursework.domain.entities.ServiceEntity;
 import com.rtumirea.KazakovIG.cursework.domain.enums.ServiceType;
 import com.rtumirea.KazakovIG.cursework.repositories.ServiceRepository;
+import com.rtumirea.KazakovIG.cursework.services.ScheduleService;
 import com.rtumirea.KazakovIG.cursework.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 @Controller
 public class LoginController {
 
     private UserService userService;
 
-    public LoginController(UserService userService) {
+    private ScheduleService scheduleService;
+
+    public LoginController(UserService userService, ScheduleService scheduleService) {
         this.userService = userService;
+        this.scheduleService = scheduleService;
     }
 
     @GetMapping(path = "/login")
@@ -28,12 +36,16 @@ public class LoginController {
     public String register(Model model) {
         UserDto userDto = new UserDto();
         model.addAttribute("user", userDto);
-//        userService.createAutoMech("Алексей",
-//                "1", "1");
-//        userService.createAutoMech("Дмитрий",
-//                "2", "1");
-//        userService.createAutoMech("Владислав",
-//                "3", "1");
+
+//        userService.addAutoMech("1", "Алексей", "1");
+//        userService.addAutoMech("2", "Дмитрий", "1");
+//        userService.addAutoMech("3", "Владислав", "1");
+//        scheduleService.generateSchedule(LocalDate.of(2024, 5, 1),
+//                LocalDate.of(2024, 5, 31),
+//                120);
+
+
+
         return "register";
     }
 

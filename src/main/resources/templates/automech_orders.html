@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Заказы</title>
+</head>
+<body>
+<h1>Новые заказы</h1>
+<div th:each="order, index : ${orders}">
+    <form th:object="${order}" th:action="@{/automech/orders/update-order}" method="POST">
+        <table>
+            <thead>
+            <tr>
+                <th>Номер заказа</th>
+                <th>Клиент</th>
+                <th>Машина</th>
+                <th>Услуги</th>
+                <th>Есть ли детали на складе?</th>
+                <th>Примерное время работы</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <input type="hidden" th:name="|id|" th:value="${order.id}" />
+                <td th:text="${order.id}"></td>
+                <td>
+                    <ul>
+                        <li th:text="'Имя: ' + ${order.carEntity.userEntity.name}"></li>
+                        <li th:text="'Номер телефона: ' + ${order.carEntity.userEntity.phoneNumber}"></li>
+                    </ul>
+                </td>
+                <td th:text="${order.carEntity.make + ' ' + order.carEntity.bodyType + ' ' + order.carEntity.stateNumber}"></td>
+                <td>
+                    <ul th:each="service : ${order.serviceEntity}">
+                        <li th:text="${service.name}"></li>
+                        <input type="hidden" th:name="|serviceIds|" th:value="${service.id}" />
+                    </ul>
+                </td>
+                <td>
+                    <input type="checkbox" th:id="'detailsCheckbox' + ${index.index}" th:onclick="'toggleDisabled(' + ${index.index} + ')'" name="detailsCheckbox" />
+                    <input required th:name="|detailsWaiting|" type="number" th:id="'detailsWaitingTime' + ${index.index}" placeholder="Сколько дней?" />
+                </td>
+                <td>
+                    <input required th:name="|workingTime|" type="number" th:id="'workingTime' + ${index.index}" placeholder="Примерное время работы" />
+                </td>
+            </tr>
+            </tbody>
+            <button type="submit">Обработать заказ</button>
+        </table>
+    </form>
+</div>
+
+<h1>Предстоящие записи</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Дата</th>
+        <th>Время</th>
+        <th>Номер заказа</th>
+        <th>Машина</th>
+        <th>Клиент</th>
+        <th>Услуги</th>
+        <th>Время работы</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="slot : ${automechSlots}" th:if="${slot.orderEntity.orderStatus!=T(com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus).COMPLETED}">
+        <td th:text="${#temporals.format(slot.day, 'dd.MM')}"></td>
+        <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
+        <td th:text="${slot.orderEntity.id}"></td>
+        <td th:text="${slot.orderEntity.carEntity.make + ' ' + slot.orderEntity.carEntity.bodyType + ' ' + slot.orderEntity.carEntity.stateNumber}"></td>
+        <td th:text="${slot.orderEntity.carEntity.userEntity.name + ' (' + slot.orderEntity.carEntity.userEntity.phoneNumber + ')'}"></td>
+        <td>
+            <table>
+                <thead>
+                <tr>
+                    <th>Название услуги</th>
+                    <th>Цена</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="service : ${slot.orderEntity.serviceEntity}">
+                    <td th:text="${service.name}"></td>
+                    <td th:text="${service.price}"></td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+        <td th:text="${slot.orderEntity.workingTime}"></td>
+        <td>
+            <form th:action="@{/automech/orders/car-ready}" method="POST" th:if="${!slot.orderEntity.carEntity.carReady}">
+                <button type="submit" name="carReady" th:value="${slot.orderEntity.id}">Клиент привез машину</button>
+            </form>
+            <form th:action="@{/automech/orders/car-unready}" method="POST" th:if="${slot.orderEntity.carEntity.carReady}">
+                <button type="submit" name="carReady" th:value="${slot.orderEntity.id}">Клиент увез машину</button>
+            </form>
+        </td>
+        <td th:if="${slot.orderEntity.carEntity.carReady}">
+            <form th:action="@{/automech/orders/order-ready}" method="POST">
+                <button type="submit" name="orderReady" th:value="${slot.orderEntity.id}">Заказ готов</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<h1>Готовые к выдаче заказы</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Дата</th>
+        <th>Время</th>
+        <th>Номер заказа</th>
+        <th>Машина</th>
+        <th>Клиент</th>
+        <th>Услуги</th>
+        <th>Время работы</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="slot : ${automechSlots}" th:if="${slot.orderEntity.orderStatus==T(com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus).COMPLETED}">
+        <td th:text="${#temporals.format(slot.day, 'dd.MM')}"></td>
+        <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
+        <td th:text="${slot.orderEntity.id}"></td>
+        <td th:text="${slot.orderEntity.carEntity.make + ' ' + slot.orderEntity.carEntity.bodyType + ' ' + slot.orderEntity.carEntity.stateNumber}"></td>
+        <td th:text="${slot.orderEntity.carEntity.userEntity.name + ' (' + slot.orderEntity.carEntity.userEntity.phoneNumber + ')'}"></td>
+        <td>
+            <table>
+                <thead>
+                <tr>
+                    <th>Название услуги</th>
+                    <th>Цена</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="service : ${slot.orderEntity.serviceEntity}">
+                    <td th:text="${service.name}"></td>
+                    <td th:text="${service.price}"></td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+        <td th:text="${slot.orderEntity.workingTime}"></td>
+        <td>
+            <form th:action="@{/automech/orders/delete-order}" method="POST" th:if="${slot.orderEntity.carEntity.carReady}">
+                <button type="submit" name="deleteOrder" th:value="${slot.orderEntity.id}">Завершить заказ</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<script th:inline="javascript">
+    function toggleDisabled(index) {
+        // Получаем чекбокс
+        const checkbox = document.getElementById('detailsCheckbox' + index);
+        // Получаем второй ввод
+        const input = document.getElementById('detailsWaitingTime' + index);
+
+        // Если чекбокс отмечен, выключаем второй ввод, иначе включаем
+        if (checkbox.checked) {
+            input.disabled = true;
+        } else {
+            input.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>

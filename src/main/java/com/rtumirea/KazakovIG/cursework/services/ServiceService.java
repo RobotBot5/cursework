@@ -3,6 +3,7 @@ package com.rtumirea.KazakovIG.cursework.services;
 import com.rtumirea.KazakovIG.cursework.domain.entities.ServiceEntity;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ServiceService {
     ServiceEntity save(ServiceEntity serviceEntity);
@@ -14,4 +15,6 @@ public interface ServiceService {
     void delete(String name);
 
     void updatePriceByName(String name, int price);
+
+    Optional<ServiceEntity> findById(Long id);
 }

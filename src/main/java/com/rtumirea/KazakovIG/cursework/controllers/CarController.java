@@ -1,15 +1,16 @@
 package com.rtumirea.KazakovIG.cursework.controllers;
 
 import com.rtumirea.KazakovIG.cursework.domain.dto.CarDto;
+import com.rtumirea.KazakovIG.cursework.domain.dto.ScheduleDto;
 import com.rtumirea.KazakovIG.cursework.domain.dto.UserDto;
-import com.rtumirea.KazakovIG.cursework.domain.entities.CarEntity;
-import com.rtumirea.KazakovIG.cursework.domain.entities.ServiceEntity;
-import com.rtumirea.KazakovIG.cursework.domain.entities.UserEntity;
+import com.rtumirea.KazakovIG.cursework.domain.dto.order.OrderDtoTo;
+import com.rtumirea.KazakovIG.cursework.domain.entities.*;
+import com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
-import com.rtumirea.KazakovIG.cursework.mappers.impl.CarMapper;
 import com.rtumirea.KazakovIG.cursework.services.CarService;
+import com.rtumirea.KazakovIG.cursework.services.OrderService;
+import com.rtumirea.KazakovIG.cursework.services.ScheduleService;
 import com.rtumirea.KazakovIG.cursework.services.UserService;
-import lombok.extern.java.Log;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,10 +19,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -36,11 +37,28 @@ public class CarController {
 
     private Mapper<UserEntity, UserDto> userMapper;
 
-    public CarController(CarService carService, Mapper<CarEntity, CarDto> carMapper, UserService userService, Mapper<UserEntity, UserDto> userMapper) {
+    private OrderService orderService;
+
+    private Mapper<OrderEntity, OrderDtoTo> orderMapperTo;
+
+    private ScheduleService scheduleService;
+
+    private Mapper<ScheduleEntity, ScheduleDto> scheduleMapper;
+
+    public CarController(CarService carService, Mapper<CarEntity,
+            CarDto> carMapper, UserService userService,
+                         Mapper<UserEntity, UserDto> userMapper, OrderService orderService,
+                         Mapper<OrderEntity, OrderDtoTo> orderMapperTo,
+                         ScheduleService scheduleService,
+                         Mapper<ScheduleEntity, ScheduleDto> scheduleMapper) {
         this.carService = carService;
         this.carMapper = carMapper;
         this.userService = userService;
         this.userMapper = userMapper;
+        this.orderService = orderService;
+        this.orderMapperTo = orderMapperTo;
+        this.scheduleService = scheduleService;
+        this.scheduleMapper = scheduleMapper;
     }
 
     @PreAuthorize("hasAuthority('ROLE_CLIENT')")
@@ -59,7 +77,51 @@ public class CarController {
         Optional<UserDto> userDto = userEntity.map(userMapper::mapTo);
         model.addAttribute("user", userDto.get());
 
+        List<OrderEntity> clientOrdersEntitiesWithPendingStatus = orderService.findByCurrentClientAndStatus(OrderStatus.PENDING);
+        List<OrderDtoTo> clientOrdersDtoWithPendingStatus = clientOrdersEntitiesWithPendingStatus
+                .stream().map(orderMapperTo::mapTo)
+                .collect(Collectors.toList());
+        model.addAttribute("ordersPending", clientOrdersDtoWithPendingStatus);
+
+        List<Integer> totalPrices = new ArrayList<>();
+        for (OrderDtoTo order : clientOrdersDtoWithPendingStatus) {
+            int totalPrice = order.getServiceEntity().stream()
+                    .mapToInt(ServiceEntity::getPrice)
+                    .sum();
+            totalPrices.add(totalPrice);
+        }
+        model.addAttribute("totals", totalPrices);
+
+        model.addAttribute("statusesTypeNames", getStatusesTypeNames());
+
+        List<ScheduleEntity> freeSlots = scheduleService.getFreeSlots();
+        model.addAttribute("freeSlots", freeSlots);
+        Set<LocalDate> freeSlotsDays = freeSlots.stream()
+                .map(ScheduleEntity::getDay)
+                .collect(Collectors.toSet());
+        model.addAttribute("freeSlotsDays", freeSlotsDays);
+
+        List<OrderEntity> clientOrdersEntitiesWithSchedulingStatus = orderService.findByCurrentClientAndStatus(OrderStatus.AWAITING_SCHEDULING);
+        List<OrderDtoTo> clientOrdersDtoWithSchedulingStatus = clientOrdersEntitiesWithSchedulingStatus
+                .stream().map(orderMapperTo::mapTo)
+                .collect(Collectors.toList());
+        model.addAttribute("ordersScheduling", clientOrdersDtoWithSchedulingStatus);
+
+        List<ScheduleEntity> clientSlotsEntities = scheduleService.getCurrentClientSlots();
+        List<ScheduleDto> clientSlotsDto = clientSlotsEntities
+                .stream().map(scheduleMapper::mapTo)
+                .collect(Collectors.toList());
+        model.addAttribute("clientSlots", clientSlotsDto);
+
         return "profile";
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_CLIENT')")
+    @PostMapping(path = "/profile/schedule/book")
+    public String bookSchedule(@RequestParam("slotId") Long slotId,
+                               @RequestParam("scheduleOrderChoice") Long orderId) {
+        scheduleService.bookSlot(slotId, orderId);
+        return "redirect:/profile";
     }
 
     @PreAuthorize("hasAuthority('ROLE_CLIENT')")
@@ -71,5 +133,15 @@ public class CarController {
         carEntity.setUserEntity(userService.findByPhoneNumber(userPhoneNumber).get());
         carService.createCar(carEntity);
         return "redirect:/profile";
+    }
+
+    public Map<String, String> getStatusesTypeNames() {
+        Map<String, String> statusesTypeNames = new HashMap<>();
+        statusesTypeNames.put("PENDING", "В обработке");
+        statusesTypeNames.put("WAITING_CAR", "Ожидание машины");
+        statusesTypeNames.put("IN_PROGRESS", "В работе");
+        statusesTypeNames.put("COMPLETED", "Завершено");
+        statusesTypeNames.put("DIESEL_ENGINE_REPAIR", "Ремонт дизельных двигателей");
+        return statusesTypeNames;
     }
 }

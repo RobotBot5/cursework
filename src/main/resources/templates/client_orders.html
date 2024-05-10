@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Client's orders</title>
+</head>
+<body>
+    <form action="#" th:action="@{/profile/orders/new-order}" th:object="${order}" method="POST">
+        <select th:field="*{carId}" id="make">
+            <option th:each="car : ${client_cars}"
+                    th:value="${car.id}" th:text="${car.make + ' ' + car.bodyType + ' ' + car.stateNumber}"></option>
+        </select>
+        <ul th:each="entry : ${servicesByType}">
+            <p th:text="${serviceTypeNames[__${entry.key}__]}"></p>
+            <li th:each="service : ${entry.value}">
+                <input type="checkbox" th:field="*{serviceIds}" th:value="${service.id}" th:attr="data-price=${service.price}" />
+                <label th:for="${#ids.prev('serviceIds')}"
+                       th:text="${service.name}"></label>
+            </li>
+        </ul>
+        <button type="submit">Оформить заказ</button>
+    </form>
+    <div id="totalPrice">Итоговая цена: 0 руб.</div>
+
+    <script th:inline="javascript">
+        function calculateTotalPrice() {
+            let totalPrice = 0;
+            const checkboxes = document.querySelectorAll('input[type=checkbox]:checked');
+            checkboxes.forEach(function(checkbox) {
+                const servicePrice = parseInt(checkbox.getAttribute('data-price'));
+                totalPrice += servicePrice;
+            });
+            document.getElementById('totalPrice').textContent = 'Итоговая цена: ' + totalPrice + ' руб.';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('input[type=checkbox]');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', calculateTotalPrice);
+            });
+        });
+    </script>
+
+</body>
+</html>
