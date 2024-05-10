@@ -22,4 +22,6 @@ public interface OrderService {
     void updateReadyStatus(Long orderId);
 
     List<OrderEntity> findByCurrentAutomech();
+
+    List<OrderEntity> findByCurrentClient();
 }

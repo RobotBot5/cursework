@@ -12,7 +12,9 @@ public interface ScheduleService {
 
     void bookSlot(Long slotId, Long orderId);
 
-    List<ScheduleEntity> getCurrentClientsSlots();
-
     List<ScheduleEntity> getCurrentAutomechSlots();
+
+    void deleteBookedOrder(Long orderId);
+
+    List<ScheduleEntity> getCurrentClientSlots();
 }

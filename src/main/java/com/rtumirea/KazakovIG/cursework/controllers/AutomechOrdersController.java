@@ -94,4 +94,12 @@ public class AutomechOrdersController {
 
         return "redirect:/automech/orders";
     }
+
+    @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
+    @PostMapping(path = "/automech/orders/delete-order")
+    public String deleteCompletedOrder(@RequestParam(name = "deleteOrder") Long orderId) {
+        scheduleService.deleteBookedOrder(orderId);
+
+        return "redirect:/automech/orders";
+    }
 }

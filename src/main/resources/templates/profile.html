@@ -24,6 +24,7 @@
                 <td th:text="${car.make}"></td>
                 <td th:text="${car.bodyType}"></td>
                 <td th:text="${car.year}"></td>
+                <td th:if="${car.carReady}">Машина в автосервисе</td>
             </tr>
         </tbody>
     </table>
@@ -166,15 +167,16 @@
                 <th>Механик</th>
                 <th>Услуги</th>
                 <th>Время работы</th>
+                <th>Статус</th>
             </tr>
         </thead>
         <tbody>
-        <tr th:each="order, index : ${ordersWaitingCar}">
-            <td th:text="${#temporals.format(clientOrdersSlots[__${index.index}__].day, 'dd.MM')}"></td>
-            <td th:text="${#temporals.format(clientOrdersSlots[__${index.index}__].startTime, 'HH:mm')}"></td>
-            <td th:text="${order.id}"></td>
-            <td th:text="${order.carEntity.make + ' ' + order.carEntity.bodyType + ' ' + order.carEntity.stateNumber}"></td>
-            <td th:text="${order.userEntity.name + ' (' + order.userEntity.phoneNumber + ')'}"></td>
+        <tr th:each="slot : ${clientSlots}">
+            <td th:text="${#temporals.format(slot.day, 'dd.MM')}"></td>
+            <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
+            <td th:text="${slot.orderEntity.id}"></td>
+            <td th:text="${slot.orderEntity.carEntity.make + ' ' + slot.orderEntity.carEntity.bodyType + ' ' + slot.orderEntity.carEntity.stateNumber}"></td>
+            <td th:text="${slot.orderEntity.userEntity.name + ' (' + slot.orderEntity.userEntity.phoneNumber + ')'}"></td>
             <td>
                 <table>
                     <thead>
@@ -184,7 +186,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="service : ${order.serviceEntity}">
+                    <tr th:each="service : ${slot.orderEntity.serviceEntity}">
                         <td th:text="${service.name}"></td>
                         <td th:text="${service.price}"></td>
                         <td></td>
@@ -192,7 +194,17 @@
                     </tbody>
                 </table>
             </td>
-            <td th:text="${order.workingTime}"></td>
+            <td th:text="${slot.orderEntity.workingTime}"></td>
+            <td th:if="${slot.orderEntity.orderStatus==T(com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus).AWAITING_CAR}">
+                Можете привезти машину заранее, при свободном окне выполним заказ раньше!:)
+            </td>
+            <td th:if="${slot.orderEntity.orderStatus==T(com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus).IN_PROGRESS}">
+                В процессе
+            </td>
+            <td th:if="${slot.orderEntity.orderStatus==T(com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus).COMPLETED}">
+                Заказ готов, можете забрать машину
+            </td>
+
         </tr>
         </tbody>
     </table>

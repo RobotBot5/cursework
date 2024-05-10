@@ -1,9 +1,11 @@
 package com.rtumirea.KazakovIG.cursework.services.impl;
 
+import com.rtumirea.KazakovIG.cursework.domain.entities.CarEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.OrderEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.ScheduleEntity;
 import com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus;
 import com.rtumirea.KazakovIG.cursework.domain.enums.ScheduleStatus;
+import com.rtumirea.KazakovIG.cursework.repositories.CarRepository;
 import com.rtumirea.KazakovIG.cursework.repositories.OrderRepository;
 import com.rtumirea.KazakovIG.cursework.repositories.ScheduleRepository;
 import com.rtumirea.KazakovIG.cursework.services.OrderService;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,10 +28,14 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private OrderService orderService;
 
-    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, OrderRepository orderRepository, OrderService orderService) {
+    private CarRepository carRepository;
+
+    public ScheduleServiceImpl(ScheduleRepository scheduleRepository, OrderRepository orderRepository,
+                               OrderService orderService, CarRepository carRepository) {
         this.scheduleRepository = scheduleRepository;
         this.orderRepository = orderRepository;
         this.orderService = orderService;
+        this.carRepository = carRepository;
     }
 
     @Override
@@ -77,19 +85,33 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<ScheduleEntity> getCurrentClientsSlots() {
-        List<OrderEntity> orderEntities = orderService.findByCurrentClientAndStatus(OrderStatus.AWAITING_CAR);
-        return orderEntities.stream()
-                .map(orderEntity -> scheduleRepository.findByOrderEntity(orderEntity).get())
-                .collect(Collectors.toList());
-
-    }
-
-    @Override
     public List<ScheduleEntity> getCurrentAutomechSlots() {
         List<OrderEntity> orderEntities = orderService.findByCurrentAutomech();
         return orderEntities.stream()
-                .map(orderEntity -> scheduleRepository.findByOrderEntity(orderEntity).get())
+                .map(orderEntity -> scheduleRepository.findByOrderEntity(orderEntity).orElse(null))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteBookedOrder(Long orderId) {
+        OrderEntity orderEntity = orderRepository.findById(orderId).get();
+        ScheduleEntity scheduleEntity = scheduleRepository.findByOrderEntity(orderEntity).get();
+        scheduleEntity.setStatus(ScheduleStatus.FREE);
+        scheduleEntity.setOrderEntity(null);
+        scheduleRepository.save(scheduleEntity);
+        CarEntity carEntity = orderEntity.getCarEntity();
+        carEntity.setCarReady(false);
+        carRepository.save(carEntity);
+        orderRepository.delete(orderEntity);
+    }
+
+    @Override
+    public List<ScheduleEntity> getCurrentClientSlots() {
+        List<OrderEntity> orderEntities = orderService.findByCurrentClient();
+        return orderEntities.stream()
+                .map(orderEntity -> scheduleRepository.findByOrderEntity(orderEntity).orElse(null))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 }

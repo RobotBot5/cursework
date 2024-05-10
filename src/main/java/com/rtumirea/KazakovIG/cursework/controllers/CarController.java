@@ -107,13 +107,11 @@ public class CarController {
                 .collect(Collectors.toList());
         model.addAttribute("ordersScheduling", clientOrdersDtoWithSchedulingStatus);
 
-        List<OrderEntity> clientOrdersEntitiesWithWaitingCarStatus = orderService.findByCurrentClientAndStatus(OrderStatus.AWAITING_CAR);
-        List<OrderDtoTo> clientOrdersDtoWithWaitingCarStatus = clientOrdersEntitiesWithWaitingCarStatus
-                .stream().map(orderMapperTo::mapTo)
+        List<ScheduleEntity> clientSlotsEntities = scheduleService.getCurrentClientSlots();
+        List<ScheduleDto> clientSlotsDto = clientSlotsEntities
+                .stream().map(scheduleMapper::mapTo)
                 .collect(Collectors.toList());
-        model.addAttribute("ordersWaitingCar", clientOrdersDtoWithWaitingCarStatus);
-
-        model.addAttribute("clientOrdersSlots", scheduleService.getCurrentClientsSlots());
+        model.addAttribute("clientSlots", clientSlotsDto);
 
         return "profile";
     }
