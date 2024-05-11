@@ -9,6 +9,10 @@
         <input type="number" name="interval" placeholder="Введите интервал между записями в минутах"/>
         <button type="submit">Добавить месяц</button>
     </form>
+    <form th:action="@{/admin/schedule/delete-month}" method="POST">
+        <button type="submit">Удалить последний месяц</button>
+    </form>
+    <div th:if="${error}" th:text="${error}" style="color: red"></div>
     <h1>Расписание</h1>
     <table>
         <thead>
@@ -21,7 +25,7 @@
         </thead>
         <tbody>
             <tr th:each="slot : ${slots}">
-                <td th:text="${#temporals.format(slot.day, 'yy.MM.dd')}"></td>
+                <td th:text="${#temporals.format(slot.day, 'dd.MM.yy')}"></td>
                 <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
                 <td th:text="${slot.status}"></td>
                 <td th:if="${slot.status==T(com.rtumirea.KazakovIG.cursework.domain.enums.ScheduleStatus).BOOKED}" th:text="${slot.orderEntity.id}"></td>

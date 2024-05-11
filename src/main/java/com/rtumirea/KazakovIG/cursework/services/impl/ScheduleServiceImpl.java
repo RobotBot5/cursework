@@ -18,7 +18,6 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -146,5 +145,18 @@ public class ScheduleServiceImpl implements ScheduleService {
     public void addMonth(int intervalInMinutes) {
         LocalDate lastDateInRepo = scheduleRepository.findFirstByOrderByIdDesc().get().getDay();
         generateScheduleForMonth(lastDateInRepo.plusMonths(1).withDayOfMonth(1), intervalInMinutes);
+    }
+
+    @Override
+    public void deleteLastMonth() {
+        scheduleRepository.deleteAll(scheduleRepository.findAllFirstMonth());
+    }
+
+    @Override
+    public boolean existOnlyOneMonth() {
+        LocalDate firstMonth = scheduleRepository.findAllFirstMonth().stream().findFirst().get().getDay();
+        LocalDate lastMonth = scheduleRepository.findFirstByOrderByIdDesc().get().getDay();
+        return firstMonth.getMonth().equals(lastMonth.getMonth()) &&
+                firstMonth.getYear() == lastMonth.getYear();
     }
 }

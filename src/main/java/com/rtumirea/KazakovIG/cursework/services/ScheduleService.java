@@ -21,4 +21,8 @@ public interface ScheduleService {
     List<ScheduleEntity> getAllSlots();
 
     void addMonth(int intervalInMinutes);
+
+    void deleteLastMonth();
+
+    boolean existOnlyOneMonth();
 }

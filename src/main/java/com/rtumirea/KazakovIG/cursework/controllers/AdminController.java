@@ -8,7 +8,6 @@ import com.rtumirea.KazakovIG.cursework.services.OrderService;
 import com.rtumirea.KazakovIG.cursework.services.ScheduleService;
 import com.rtumirea.KazakovIG.cursework.services.ServiceService;
 import com.rtumirea.KazakovIG.cursework.services.UserService;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -99,6 +97,18 @@ public class AdminController {
     @PostMapping(path = "/admin/schedule/add-month")
     public String addMonth(@RequestParam(name = "interval") Integer interval) {
         scheduleService.addMonth(interval);
+        return "redirect:/admin/schedule";
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping(path = "/admin/schedule/delete-month")
+    public String deleteMonth(RedirectAttributes redirectAttributes) {
+        if(scheduleService.existOnlyOneMonth()) {
+            redirectAttributes.addFlashAttribute("error", "Существует только один месяц!");
+            return "redirect:/admin/schedule";
+        }
+
+        scheduleService.deleteLastMonth();
         return "redirect:/admin/schedule";
     }
 }

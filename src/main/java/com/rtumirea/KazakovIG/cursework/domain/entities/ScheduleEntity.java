@@ -30,7 +30,7 @@ public class ScheduleEntity {
     @Enumerated(EnumType.STRING)
     private ScheduleStatus status;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "order_id")
     private OrderEntity orderEntity;
 
