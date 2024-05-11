@@ -66,7 +66,7 @@ public class AutomechServiceController {
     public String createService(@ModelAttribute("service") ServiceDto serviceDto, RedirectAttributes redirectAttributes) {
 
         if(serviceService.isServiceNameExists(serviceDto.getName())) {
-            redirectAttributes.addFlashAttribute("error", "Такое название услуги уже существует");
+            redirectAttributes.addFlashAttribute("error_service_name", "Такое название услуги уже существует");
             return "redirect:/admin/services";
         }
 
@@ -77,7 +77,12 @@ public class AutomechServiceController {
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping(path = "/automech_services/delete-service")
-    public String deleteService(@RequestParam("deletable_service_name") String deletable_service_name) {
+    public String deleteService(@RequestParam(name = "deletable_service_name", required = false) String deletable_service_name,
+                                RedirectAttributes redirectAttributes) {
+        if(deletable_service_name == null) {
+            redirectAttributes.addFlashAttribute("error_delete_service", "Выберете услугу");
+            return "redirect:/admin/services";
+        }
         serviceService.prepareToDelete(deletable_service_name);
         return "redirect:/admin/services";
     }
@@ -85,10 +90,11 @@ public class AutomechServiceController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping(path = "/automech_services/update-cost")
     public String updateCostServiceByName(
-            @RequestParam("updatable_service_name") String updatable_service_name,
-            @RequestParam("updatable_service_price") int updatable_service_price) {
-        if(!serviceService.isServiceNameExists(updatable_service_name)) {
-            log.warning("Can't find service in updateCostServiceByName: " + updatable_service_name);
+            @RequestParam(name = "updatable_service_name", required = false) String updatable_service_name,
+            @RequestParam("updatable_service_price") int updatable_service_price,
+            RedirectAttributes redirectAttributes) {
+        if(updatable_service_name == null) {
+            redirectAttributes.addFlashAttribute("error_update_service", "Выберете услугу");
             return "redirect:/admin/services";
         }
         serviceService.updatePriceByName(updatable_service_name, updatable_service_price);

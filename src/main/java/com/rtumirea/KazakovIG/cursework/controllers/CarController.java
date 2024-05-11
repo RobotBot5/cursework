@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -71,6 +72,8 @@ public class CarController {
                 .collect(Collectors.toList()));
         model.addAttribute("car", carDto);
 
+        model.addAttribute("currentYear", LocalDate.now().getYear());
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userPhoneNumber = authentication.getName();
         Optional<UserEntity> userEntity = userService.findByPhoneNumber(userPhoneNumber);
@@ -96,9 +99,9 @@ public class CarController {
 
         List<ScheduleEntity> freeSlots = scheduleService.getFreeSlots();
         model.addAttribute("freeSlots", freeSlots);
-        Set<LocalDate> freeSlotsDays = freeSlots.stream()
-                .map(ScheduleEntity::getDay)
-                .collect(Collectors.toSet());
+
+        List<LocalDate> freeSlotsDays = freeSlots.stream()
+                .map(ScheduleEntity::getDay).distinct().collect(Collectors.toList());
         model.addAttribute("freeSlotsDays", freeSlotsDays);
 
         List<OrderEntity> clientOrdersEntitiesWithSchedulingStatus = orderService.findByCurrentClientAndStatus(OrderStatus.AWAITING_SCHEDULING);
@@ -119,7 +122,12 @@ public class CarController {
     @PreAuthorize("hasAuthority('ROLE_CLIENT')")
     @PostMapping(path = "/profile/schedule/book")
     public String bookSchedule(@RequestParam("slotId") Long slotId,
-                               @RequestParam("scheduleOrderChoice") Long orderId) {
+                               @RequestParam(name = "scheduleOrderChoice", required = false) Long orderId,
+                               RedirectAttributes redirectAttributes) {
+        if(orderId == null) {
+            redirectAttributes.addFlashAttribute("error_book_order", "Выберете заказ для записи");
+            return "redirect:/profile";
+        }
         scheduleService.bookSlot(slotId, orderId);
         return "redirect:/profile";
     }

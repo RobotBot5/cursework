@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -29,10 +30,15 @@ public class UserController {
     }
 
     @PostMapping(path = "/new-user")
-    public String addUser(@ModelAttribute("user") UserDto userDto, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    public String addUser(@ModelAttribute("user") UserDto userDto, HttpServletRequest request, RedirectAttributes redirectAttributes,
+                          @RequestParam(name = "password_check") String passwordCheck) {
         if(userService.isUserExists(userDto.getPhoneNumber())) {
             redirectAttributes.addFlashAttribute("error", "Номер телефона уже зарегистрирован");
             return "redirect:/register";
+        }
+        if(!userDto.getPassword().equals(passwordCheck)) {
+            redirectAttributes.addFlashAttribute("error", "Пароль должен совпадать");
+            return "redirect:/admin/automechs";
         }
 
         userDto.setRoles("ROLE_CLIENT");
@@ -48,9 +54,14 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping(path = "/new-automech")
-    public String addAutomech(@ModelAttribute("user") UserDto userDto, HttpServletRequest request, RedirectAttributes redirectAttributes) {
+    public String addAutomech(@ModelAttribute("user") UserDto userDto, HttpServletRequest request, RedirectAttributes redirectAttributes,
+                              @RequestParam(name = "password_check") String passwordCheck) {
         if(userService.isUserExists(userDto.getPhoneNumber())) {
             redirectAttributes.addFlashAttribute("error", "Номер телефона уже зарегистрирован");
+            return "redirect:/admin/automechs";
+        }
+        if(!userDto.getPassword().equals(passwordCheck)) {
+            redirectAttributes.addFlashAttribute("error", "Пароль должен совпадать");
             return "redirect:/admin/automechs";
         }
 

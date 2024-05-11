@@ -7,9 +7,10 @@
 <body>
 <h1>Регистрация</h1>
 <form action="#" th:action="@{/new-user}" th:object="${user}" method="POST">
-    <input type="text" th:field="*{phoneNumber}" placeholder="Введите Ваш номер телефона">
-    <input type="text" th:field="*{name}" placeholder="Введите Ваше имя">
-    <input type="text" th:field="*{password}" placeholder="Введите пароль">
+    <input type="text" th:field="*{phoneNumber}" pattern="8\d{10}" placeholder="Введите Ваш номер телефона" required>
+    <input type="text" th:field="*{name}" placeholder="Введите Ваше имя" required>
+    <input type="text" th:field="*{password}" placeholder="Введите пароль" required>
+    <input type="password" name="password_check" placeholder="Введите пароль еще раз" required>
     <div th:if="${error}" style="color: red;" th:text="${error}"></div>
     <button type="submit">Зарегистрироваться</button>
 </form>

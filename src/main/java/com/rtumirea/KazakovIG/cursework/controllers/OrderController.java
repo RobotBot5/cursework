@@ -20,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -55,10 +56,15 @@ public class OrderController {
 
     @PreAuthorize("hasAuthority('ROLE_CLIENT')")
     @GetMapping(path = "/profile/orders")
-    public String orderList(Model model) {
-        model.addAttribute("client_cars", carService
+    public String orderList(Model model, RedirectAttributes redirectAttributes) {
+        List<CarDto> clientCars = carService
                 .findCurrentUserCarsWithoutOrders().stream()
-                .map(carMapper::mapTo).collect(Collectors.toList()));
+                .map(carMapper::mapTo).collect(Collectors.toList());
+        if(clientCars.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error_no_cars", "У Вас нет машин, на которые можно оформить заказ");
+            return "redirect:/profile";
+        }
+        model.addAttribute("client_cars", clientCars);
         model.addAttribute("order", new OrderDtoFrom());
 
         List<ServiceEntity> serviceEntities = serviceService.findAll();
@@ -72,7 +78,13 @@ public class OrderController {
 
     @PreAuthorize("hasAuthority('ROLE_CLIENT')")
     @PostMapping(path = "/profile/orders/new-order")
-    public String createOrder(@ModelAttribute OrderDtoFrom orderDto) {
+    public String createOrder(@ModelAttribute OrderDtoFrom orderDto, RedirectAttributes redirectAttributes) {
+
+        if(orderDto.getServiceIds().isEmpty()) {
+            redirectAttributes.addFlashAttribute("error_no_services", "Выберете услуги");
+            return "redirect:/profile/orders";
+        }
+
         OrderEntity orderEntity = orderMapper.mapFrom(orderDto);
         orderEntity.setOrderStatus(OrderStatus.PENDING);
         UserEntity autoMechToOrder = userService.findAutoMechWithMinOrdersNum().get();

@@ -9,7 +9,7 @@
     <p>Номер телефона: <span th:text="${user.phoneNumber}"></span> </p>
     <p>Имя: <span th:text="${user.name}"></span></p>
     <h1>Список автомобилей</h1>
-    <table>
+    <table th:if="${!listCars.isEmpty()}">
         <thead>
             <tr>
                 <th>ГосНомер</th>
@@ -28,6 +28,7 @@
             </tr>
         </tbody>
     </table>
+    <p th:unless="${!listCars.isEmpty()}">У вас нет зарегистрированных автомобилей</p>
     <h2>Добавить автомобиль</h2>
     <form action="#" th:action="@{/profile/new-car}" th:object="${car}" method="POST">
         <select th:field="*{make}" id="make">
@@ -42,14 +43,17 @@
             <option th:each="audiBodyType : ${T(com.rtumirea.KazakovIG.cursework.domain.enums.AudiBodyType).values()}"
                     th:value="${audiBodyType}" th:text="${audiBodyType}" class="AUDI">
         </select>
-        <input type="number" th:field="*{year}" placeholder="Введите год выпуска">
-        <input type="text" th:field="*{stateNumber}" placeholder="Введите ГосНомер машины">
+        <input type="number" th:field="*{year}" placeholder="Введите год выпуска" required min="1980" th:max="${currentYear}">
+        <input type="text" th:field="*{stateNumber}" placeholder="Введите ГосНомер машины"
+               pattern="[А-ЯA-Z]{1}\d{3}[А-ЯA-Z]{2}\d{2,3}"
+               title="А111АА777" required>
         <button type="submit">Добавить</button>
     </form>
     <p> <a th:href="@{/profile/orders}">Оформить новый заказ</a></p>
+    <div th:if="${error_no_cars}" th:text="${error_no_cars}" style="color: red"></div>
     <p>Хотите посмотреть услуги? <a th:href="@{/client_services}">Услуги</a></p>
     <h1>Список заказов в обработке</h1>
-    <table>
+    <table th:if="${!ordersPending.isEmpty()}">
         <thead>
         <tr>
             <th>Номер заказа</th>
@@ -85,9 +89,10 @@
         </tr>
         </tbody>
     </table>
+    <div th:unless="${!ordersPending.isEmpty()}">Нет заказов в обработке</div>
 
     <h1>Список заказов, ожидающих записи</h1>
-    <form th:action="@{/profile/schedule/book}" method="post">
+    <form th:action="@{/profile/schedule/book}" method="post" th:if="${!ordersScheduling.isEmpty()}">
         <table>
             <thead>
             <tr>
@@ -132,7 +137,7 @@
         <h1>Выберете время</h1>
 
         <select id="daySelector">
-            <option th:each="freeSlotDay : ${freeSlotsDays}" th:text="${#temporals.format(freeSlotDay, 'dd.MM')}" th:value="${freeSlotDay}"></option>
+            <option th:each="freeSlotDay : ${freeSlotsDays}" th:text="${#temporals.format(freeSlotDay, 'dd.MM.yy')}" th:value="${freeSlotDay}"></option>
         </select>
 
         <table>
@@ -145,7 +150,7 @@
             </thead>
             <tbody id="freeSlots">
             <tr th:each="slot : ${freeSlots}" th:class="${slot.day} + ' schedule'">
-                <td th:text="${#temporals.format(slot.day, 'dd.MM')}"></td>
+                <td th:text="${#temporals.format(slot.day, 'dd.MM.yy')}"></td>
                 <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
                 <td>
                     <input type="hidden"/>
@@ -155,9 +160,11 @@
             </tbody>
         </table>
     </form>
+    <div th:if="${error_book_order}" th:text="${error_book_order}" style="color: red"></div>
+    <div th:unless="${!ordersScheduling.isEmpty()}">Нет заказов, ожидающих записи</div>
 
     <h1>Ваши записи</h1>
-    <table>
+    <table th:if="${!clientSlots.isEmpty()}">
         <thead>
             <tr>
                 <th>Дата</th>
@@ -207,6 +214,7 @@
         </tr>
         </tbody>
     </table>
+    <div th:unless="${!clientSlots.isEmpty()}">Нет записей</div>
 
     <script th:inline="javascript">
         (() => {

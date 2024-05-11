@@ -10,15 +10,15 @@
         <option th:each="type : ${T(com.rtumirea.KazakovIG.cursework.domain.enums.ServiceType).values()}"
                 th:value="${type}" th:text="${serviceTypeNames[__${type}__]}"></option>
     </select>
-    <input type="text" th:field="*{name}" placeholder="Введите название услуги">
-    <input type="number" th:field="*{price}" placeholder="Введите цену услуги">
-    <div th:if="${error}" style="color: red;" th:text="${error}"></div>
+    <input type="text" th:field="*{name}" placeholder="Введите название услуги" required>
+    <input type="number" th:field="*{price}" placeholder="Введите цену услуги" required>
+    <div th:if="${error_service_name}" style="color: red;" th:text="${error_service_name}"></div>
     <button type="submit">Добавить услугу</button>
 </form>
 
 <form action="#" th:action="@{/automech_services/delete-service}" method="POST">
     <select name="deletable_service_name">
-        <option disabled selected>Выберите услугу</option>
+        <option disabled selected th:value="error">Выберите услугу</option>
         <th:block th:each="entry : ${servicesByType}">
             <option disabled th:text="'--' + ${serviceTypeNames[__${entry.key}__]} + '--'"></option>
             <th:block th:each="service : ${entry.value}">
@@ -26,13 +26,13 @@
             </th:block>
         </th:block>
     </select>
+    <div th:if="${error_delete_service}" style="color: red;" th:text="${error_delete_service}"></div>
     <button type="submit">Удалить сервис</button>
 </form>
-<div th:if="${error_delete}" style="color: red;" th:text="${error_delete}"></div>
 
 <form action="#" th:action="@{/automech_services/update-cost}" method="POST">
     <select name="updatable_service_name">
-        <option disabled selected>Выберите услугу</option>
+        <option disabled selected th:value="error">Выберите услугу</option>
         <th:block th:each="entry : ${servicesByType}">
             <option disabled th:text="'--' + ${serviceTypeNames[__${entry.key}__]} + '--'"></option>
             <th:block th:each="service : ${entry.value}">
@@ -40,7 +40,8 @@
             </th:block>
         </th:block>
     </select>
-    <input type="number" name="updatable_service_price" placeholder="Введите новую цену услуги">
+    <input type="number" name="updatable_service_price" placeholder="Введите новую цену услуги" required>
+    <div th:if="${error_update_service}" style="color: red;" th:text="${error_update_service}"></div>
     <button type="submit">Обновить цену услуги</button>
 </form>
 

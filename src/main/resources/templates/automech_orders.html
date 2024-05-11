@@ -51,7 +51,7 @@
 </div>
 
 <h1>Предстоящие записи</h1>
-<table>
+<table th:if="${!automechSlotsNonCompleted.isEmpty()}">
     <thead>
     <tr>
         <th>Дата</th>
@@ -64,7 +64,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="slot : ${automechSlots}" th:if="${slot.orderEntity.orderStatus!=T(com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus).COMPLETED}">
+    <tr th:each="slot : ${automechSlotsNonCompleted}">
         <td th:text="${#temporals.format(slot.day, 'dd.MM')}"></td>
         <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
         <td th:text="${slot.orderEntity.id}"></td>
@@ -104,9 +104,10 @@
     </tr>
     </tbody>
 </table>
+<div th:unless="${!automechSlotsNonCompleted.isEmpty()}">Нет предстоящих записей</div>
 
 <h1>Готовые к выдаче заказы</h1>
-<table>
+<table th:if="${!automechSlotsCompleted.isEmpty()}">
     <thead>
     <tr>
         <th>Дата</th>
@@ -119,7 +120,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="slot : ${automechSlots}" th:if="${slot.orderEntity.orderStatus==T(com.rtumirea.KazakovIG.cursework.domain.enums.OrderStatus).COMPLETED}">
+    <tr th:each="slot : ${automechSlotsCompleted}">
         <td th:text="${#temporals.format(slot.day, 'dd.MM')}"></td>
         <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
         <td th:text="${slot.orderEntity.id}"></td>
@@ -151,6 +152,7 @@
     </tr>
     </tbody>
 </table>
+<div th:unless="${!automechSlotsCompleted.isEmpty()}">Нет заказов, готовых к выдаче</div>
 
 <script th:inline="javascript">
     function toggleDisabled(index) {

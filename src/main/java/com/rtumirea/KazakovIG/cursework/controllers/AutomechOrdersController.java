@@ -58,8 +58,15 @@ public class AutomechOrdersController {
         List<ScheduleDto> automechSlotsDto = automechSlotsEntities
                 .stream().map(scheduleMapper::mapTo)
                 .collect(Collectors.toList());
+        List<ScheduleDto> automechSlotsNonCompleted = automechSlotsDto.stream().filter(
+                automechSlotsEntity -> !automechSlotsEntity.getOrderEntity().getOrderStatus()
+                        .equals(OrderStatus.COMPLETED)).collect(Collectors.toList());
+        List<ScheduleDto> automechSlotsCompleted = automechSlotsDto.stream().filter(
+                automechSlotsEntity -> automechSlotsEntity.getOrderEntity().getOrderStatus()
+                        .equals(OrderStatus.COMPLETED)).collect(Collectors.toList());
 
-        model.addAttribute("automechSlots", automechSlotsDto);
+        model.addAttribute("automechSlotsNonCompleted", automechSlotsNonCompleted);
+        model.addAttribute("automechSlotsCompleted", automechSlotsCompleted);
 
         return "automech_orders";
     }

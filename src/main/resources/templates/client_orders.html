@@ -18,6 +18,7 @@
                        th:text="${service.name}"></label>
             </li>
         </ul>
+        <div th:if="${error_no_services}" th:text="${error_no_services}" style="color: red"></div>
         <button type="submit">Оформить заказ</button>
     </form>
     <div id="totalPrice">Итоговая цена: 0 руб.</div>
