@@ -12,12 +12,15 @@ import com.rtumirea.KazakovIG.cursework.services.OrderService;
 import com.rtumirea.KazakovIG.cursework.services.ScheduleService;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class ScheduleServiceImpl implements ScheduleService {
@@ -30,29 +33,44 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private CarRepository carRepository;
 
+    private LocalDate[] nonWorkingDays;
+
     public ScheduleServiceImpl(ScheduleRepository scheduleRepository, OrderRepository orderRepository,
                                OrderService orderService, CarRepository carRepository) {
         this.scheduleRepository = scheduleRepository;
         this.orderRepository = orderRepository;
         this.orderService = orderService;
         this.carRepository = carRepository;
+        nonWorkingDays = new LocalDate[] {LocalDate.of(2024, 1, 1),
+                LocalDate.of(2024, 1, 2), LocalDate.of(2024, 1, 3),
+                LocalDate.of(2024, 1, 4), LocalDate.of(2024, 1, 5),
+                LocalDate.of(2024, 1, 6), LocalDate.of(2024, 1, 7),
+                LocalDate.of(2024, 1, 8), LocalDate.of(2024, 2, 23),
+                LocalDate.of(2024, 3, 8), LocalDate.of(2024, 5, 1),
+                LocalDate.of(2024, 5, 9), LocalDate.of(2024, 6, 12),
+                LocalDate.of(2024, 11, 4)};
     }
 
     @Override
-    public void generateSchedule(LocalDate startDate, LocalDate endDate, int intervalInMinutes) {
+    public void generateScheduleForMonth(LocalDate startDate, int intervalInMinutes) {
         LocalDate currentDate = startDate;
+        LocalDate endDate = startDate.plusDays(startDate.getMonth().length(false));
 
         LocalTime workStartTime = LocalTime.of(9, 0); // 9:00 утра
         LocalTime workEndTime = LocalTime.of(21, 0); // 9:00 вечера
 
         LocalTime currentTime = workStartTime;
 
-        while (currentDate.isBefore(endDate.plusDays(1))) {
-            if (currentTime.isBefore(workEndTime)) {
+        List<LocalDate> nonWorkingDaysList = Arrays.stream(nonWorkingDays)
+                .map(localDate -> localDate.withYear(startDate.getYear())).collect(Collectors.toList());
+
+        while (currentDate.isBefore(endDate)) {
+            if (currentTime.isBefore(workEndTime) && !nonWorkingDaysList.contains(currentDate) &&
+                    !currentDate.getDayOfWeek().equals(DayOfWeek.SATURDAY) &&
+                    !currentDate.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
                 scheduleRepository.save(ScheduleEntity.builder()
                         .day(currentDate)
                         .startTime(currentTime)
-                        .endTime(currentTime.plusMinutes(intervalInMinutes))
                         .status(ScheduleStatus.FREE)
                         .build());
                 currentTime = currentTime.plusMinutes(intervalInMinutes);
@@ -113,5 +131,20 @@ public class ScheduleServiceImpl implements ScheduleService {
                 .map(orderEntity -> scheduleRepository.findByOrderEntity(orderEntity).orElse(null))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ScheduleEntity> getAllSlots() {
+        return StreamSupport.stream(
+                scheduleRepository.findAll()
+                        .spliterator(),
+                        false)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void addMonth(int intervalInMinutes) {
+        LocalDate lastDateInRepo = scheduleRepository.findFirstByOrderByIdDesc().get().getDay();
+        generateScheduleForMonth(lastDateInRepo.plusMonths(1).withDayOfMonth(1), intervalInMinutes);
     }
 }

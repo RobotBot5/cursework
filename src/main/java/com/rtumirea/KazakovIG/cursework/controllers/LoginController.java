@@ -40,9 +40,7 @@ public class LoginController {
 //        userService.addAutoMech("1", "Алексей", "1");
 //        userService.addAutoMech("2", "Дмитрий", "1");
 //        userService.addAutoMech("3", "Владислав", "1");
-//        scheduleService.generateSchedule(LocalDate.of(2024, 5, 1),
-//                LocalDate.of(2024, 5, 31),
-//                120);
+        scheduleService.generateScheduleForMonth(LocalDate.of(2024, 7, 1), 120);
 //        userService.createAdmin("admin");
 
 

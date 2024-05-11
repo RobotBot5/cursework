@@ -16,4 +16,6 @@ public interface ScheduleRepository extends CrudRepository<ScheduleEntity, Long>
 
     Optional<ScheduleEntity> findByOrderEntity(OrderEntity orderEntity);
 
+    Optional<ScheduleEntity> findFirstByOrderByIdDesc();
+
 }

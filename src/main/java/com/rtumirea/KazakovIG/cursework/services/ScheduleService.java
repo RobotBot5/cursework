@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ScheduleService {
-    void generateSchedule(LocalDate startDate, LocalDate endDate, int intervalInMinutes);
+    void generateScheduleForMonth(LocalDate startDate, int intervalInMinutes);
 
     List<ScheduleEntity> getFreeSlots();
 
@@ -17,4 +17,8 @@ public interface ScheduleService {
     void deleteBookedOrder(Long orderId);
 
     List<ScheduleEntity> getCurrentClientSlots();
+
+    List<ScheduleEntity> getAllSlots();
+
+    void addMonth(int intervalInMinutes);
 }

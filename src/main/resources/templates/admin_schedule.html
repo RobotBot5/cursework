@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Расписание</title>
+</head>
+<body>
+    <form th:action="@{/admin/schedule/add-month}" method="POST">
+        <input type="number" name="interval" placeholder="Введите интервал между записями в минутах"/>
+        <button type="submit">Добавить месяц</button>
+    </form>
+    <h1>Расписание</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Дата</th>
+                <th>Время</th>
+                <th>Статус</th>
+                <th>Номер заказа</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="slot : ${slots}">
+                <td th:text="${#temporals.format(slot.day, 'yy.MM.dd')}"></td>
+                <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
+                <td th:text="${slot.status}"></td>
+                <td th:if="${slot.status==T(com.rtumirea.KazakovIG.cursework.domain.enums.ScheduleStatus).BOOKED}" th:text="${slot.orderEntity.id}"></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

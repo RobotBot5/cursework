@@ -27,9 +27,6 @@ public class ScheduleEntity {
     @Column(name = "start_time")
     private LocalTime startTime;
 
-    @Column(name = "end_time")
-    private LocalTime endTime;
-
     @Enumerated(EnumType.STRING)
     private ScheduleStatus status;
 

@@ -24,8 +24,6 @@ public class ScheduleDto {
 
     private LocalTime startTime;
 
-    private LocalTime endTime;
-
     private ScheduleStatus status;
 
     private OrderEntity orderEntity;
