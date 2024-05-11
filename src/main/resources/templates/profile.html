@@ -179,7 +179,7 @@
         </thead>
         <tbody>
         <tr th:each="slot : ${clientSlots}">
-            <td th:text="${#temporals.format(slot.day, 'dd.MM')}"></td>
+            <td th:text="${#temporals.format(slot.day, 'dd.MM.yy')}"></td>
             <td th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
             <td th:text="${slot.orderEntity.id}"></td>
             <td th:text="${slot.orderEntity.carEntity.make + ' ' + slot.orderEntity.carEntity.bodyType + ' ' + slot.orderEntity.carEntity.stateNumber}"></td>

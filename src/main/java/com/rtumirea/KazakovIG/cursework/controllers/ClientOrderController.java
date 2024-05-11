@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 @Log
 @Controller
-public class OrderController {
+public class ClientOrderController {
 
     private CarService carService;
 
@@ -43,9 +43,9 @@ public class OrderController {
 
     private OrderService orderService;
 
-    public OrderController(CarService carService, Mapper<CarEntity, CarDto> carMapper,
-                           ServiceService serviceService, Mapper<OrderEntity, OrderDtoFrom> orderMapper,
-                           UserService userService, OrderService orderService) {
+    public ClientOrderController(CarService carService, Mapper<CarEntity, CarDto> carMapper,
+                                 ServiceService serviceService, Mapper<OrderEntity, OrderDtoFrom> orderMapper,
+                                 UserService userService, OrderService orderService) {
         this.carService = carService;
         this.carMapper = carMapper;
         this.serviceService = serviceService;

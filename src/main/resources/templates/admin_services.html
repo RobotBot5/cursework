@@ -5,7 +5,7 @@
     <title>Services List</title>
 </head>
 <body>
-<form action="#" th:action="@{/automech_services/new-service}" th:object="${service}" method="POST">
+<form action="#" th:action="@{/admin/services/new-service}" th:object="${service}" method="POST">
     <select th:field="*{serviceType}">
         <option th:each="type : ${T(com.rtumirea.KazakovIG.cursework.domain.enums.ServiceType).values()}"
                 th:value="${type}" th:text="${serviceTypeNames[__${type}__]}"></option>
@@ -16,7 +16,7 @@
     <button type="submit">Добавить услугу</button>
 </form>
 
-<form action="#" th:action="@{/automech_services/delete-service}" method="POST">
+<form action="#" th:action="@{/admin/services/delete-service}" method="POST">
     <select name="deletable_service_name">
         <option disabled selected th:value="error">Выберите услугу</option>
         <th:block th:each="entry : ${servicesByType}">
@@ -30,7 +30,7 @@
     <button type="submit">Удалить сервис</button>
 </form>
 
-<form action="#" th:action="@{/automech_services/update-cost}" method="POST">
+<form action="#" th:action="@{/admin/services/update-cost}" method="POST">
     <select name="updatable_service_name">
         <option disabled selected th:value="error">Выберите услугу</option>
         <th:block th:each="entry : ${servicesByType}">

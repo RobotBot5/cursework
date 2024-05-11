@@ -27,8 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-//@RequestMapping(path = "profile")
-public class CarController {
+public class ClientProfileController {
 
     private CarService carService;
 
@@ -46,12 +45,12 @@ public class CarController {
 
     private Mapper<ScheduleEntity, ScheduleDto> scheduleMapper;
 
-    public CarController(CarService carService, Mapper<CarEntity,
+    public ClientProfileController(CarService carService, Mapper<CarEntity,
             CarDto> carMapper, UserService userService,
-                         Mapper<UserEntity, UserDto> userMapper, OrderService orderService,
-                         Mapper<OrderEntity, OrderDtoTo> orderMapperTo,
-                         ScheduleService scheduleService,
-                         Mapper<ScheduleEntity, ScheduleDto> scheduleMapper) {
+                                   Mapper<UserEntity, UserDto> userMapper, OrderService orderService,
+                                   Mapper<OrderEntity, OrderDtoTo> orderMapperTo,
+                                   ScheduleService scheduleService,
+                                   Mapper<ScheduleEntity, ScheduleDto> scheduleMapper) {
         this.carService = carService;
         this.carMapper = carMapper;
         this.userService = userService;
