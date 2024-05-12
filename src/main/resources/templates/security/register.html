@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html style="font-size: 16px;" lang="ru"><head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="../../static/css/nicepage.css" th:href="@{/css/nicepage.css}" media="screen">
+    <link rel="stylesheet" href="../../static/css/login.css" th:href="@{/css/login.css}" media="screen">
+    <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
+</head>
+<body data-path-to-root="./" data-include-products="false" class="u-body u-xl-mode" data-lang="ru">
+<section class="u-clearfix u-section-1" id="sec-3d0e">
+    <div class="u-clearfix u-sheet u-sheet-1">
+        <div class="u-form u-login-control u-form-1">
+            <form th:action="@{/new-user}" th:object="${user}" class="u-clearfix u-form-custom-backend u-form-spacing-10 u-form-vertical u-inner-form" name="form" style="padding: 10px;" method="POST">
+                <div class="u-form-group u-form-name">
+                    <label for="username-a30d" class="u-label">Номер телефона*</label>
+                    <input type="text" th:field="*{phoneNumber}" pattern="8\d{10}" placeholder="89991112233" id="username-a30d" name="username" class="u-input u-input-rectangle u-none u-input-1" required="">
+                </div>
+                <div class="u-form-group u-form-name">
+                    <label for="username-a31d" class="u-label">Имя*</label>
+                    <input type="text" th:field="*{name}" placeholder="Введите Ваше имя" id="username-a31d" name="username" class="u-input u-input-rectangle u-none u-input-1" required="">
+                </div>
+                <div class="u-form-group u-form-password">
+                    <label for="password-a30d" class="u-label">Пароль*</label>
+                    <input type="password" th:field="*{password}" placeholder="Введите пароль" id="password-a30d" name="password" class="u-input u-input-rectangle u-none u-input-2" required="">
+                </div>
+                <div class="u-form-group u-form-password">
+                    <label for="password-a31d" class="u-label">Повторите пароль*</label>
+                    <input type="password" name="password_check" placeholder="Введите пароль еще раз" id="password-a31d" class="u-input u-input-rectangle u-none u-input-2" required="">
+                </div>
+                <div th:if="${error}" th:text="${error}" style="color: red">
+                </div>
+                <div class="u-align-left u-form-group u-form-submit">
+                    <button type="submit" class="u-btn u-btn-submit u-button-style u-btn-1">Зарегистрироваться</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+
+
+
+</body></html>

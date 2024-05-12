@@ -21,4 +21,6 @@ public interface CarService {
     List<CarEntity> findCarsOfClient(UserEntity userEntity);
 
     void updateCarStatus(CarEntity carEntity, Boolean carReady);
+
+    Optional<CarEntity> findByStateNumber(String stateNumber);
 }

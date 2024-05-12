@@ -3,6 +3,7 @@ package com.rtumirea.KazakovIG.cursework.controllers;
 import com.rtumirea.KazakovIG.cursework.domain.dto.ServiceDto;
 import com.rtumirea.KazakovIG.cursework.domain.dto.UserDto;
 import com.rtumirea.KazakovIG.cursework.domain.entities.OrderEntity;
+import com.rtumirea.KazakovIG.cursework.domain.entities.ScheduleEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.ServiceEntity;
 import com.rtumirea.KazakovIG.cursework.domain.entities.UserEntity;
 import com.rtumirea.KazakovIG.cursework.domain.enums.ServiceType;
@@ -11,6 +12,7 @@ import com.rtumirea.KazakovIG.cursework.services.OrderService;
 import com.rtumirea.KazakovIG.cursework.services.ScheduleService;
 import com.rtumirea.KazakovIG.cursework.services.ServiceService;
 import com.rtumirea.KazakovIG.cursework.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +61,27 @@ public class AdminController {
         List<UserEntity> automechEntities = userService.getAutomechs();
         List<UserDto> automechDto = automechEntities.stream().map(userMapper::mapTo).collect(Collectors.toList());
         model.addAttribute("automechs", automechDto);
-        return "register_automech";
+        return "admin/register_automech";
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping(path = "/admin/automechs/new-automech")
+    public String addAutomech(@ModelAttribute("user") UserDto userDto, HttpServletRequest request, RedirectAttributes redirectAttributes,
+                              @RequestParam(name = "password_check") String passwordCheck) {
+        if(userService.isUserExists(userDto.getPhoneNumber())) {
+            redirectAttributes.addFlashAttribute("error", "Номер телефона уже зарегистрирован");
+            return "redirect:/admin/automechs";
+        }
+        if(!userDto.getPassword().equals(passwordCheck)) {
+            redirectAttributes.addFlashAttribute("error", "Пароль должен совпадать");
+            return "redirect:/admin/automechs";
+        }
+
+        userDto.setRoles("ROLE_AUTOMECH");
+        userDto.setOrdersNum(0);
+        UserEntity userEntity = userMapper.mapFrom(userDto);
+        userService.addUser(userEntity);
+        return "redirect:/admin/automechs";
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
@@ -69,38 +92,13 @@ public class AdminController {
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @PostMapping(path = "/admin/services/delete-finally")
-    public String deleteFinallyService(@RequestParam(name = "finallyDeletableServiceId") Long serviceId,
-                                       RedirectAttributes redirectAttributes) {
-        List<OrderEntity> allOrders = orderService.findAll();
-
-        if(allOrders.stream()
-                .anyMatch(orderEntity -> orderEntity.getServiceEntity().stream()
-                        .anyMatch(serviceEntity -> serviceEntity.getId().equals(serviceId))))
-        {
-            redirectAttributes.addFlashAttribute("error_delete", "Заказы с такой услугой еще есть");
-            return "redirect:/admin/services";
-        }
-
-        serviceService.deleteFinally(serviceId);
-
-        return "redirect:/admin/services";
-    }
-
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @PostMapping(path = "/admin/services/undelete-service")
-    public String deleteFinallyService(@RequestParam(name = "unDeleteServiceId") Long serviceId) {
-        serviceService.undelete(serviceId);
-
-        return "redirect:/admin/services";
-    }
-
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping(path = "/admin/schedule")
     public String getSchedulePage(Model model) {
-        model.addAttribute("slots", scheduleService.getAllSlots());
+        List<ScheduleEntity> allSlots = scheduleService.getAllSlots();
+        allSlots.sort(Comparator.comparing(ScheduleEntity::getId));
+        model.addAttribute("slots", allSlots);
 
-        return "admin_schedule";
+        return "admin/admin_schedule";
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -132,25 +130,7 @@ public class AdminController {
         Map<String, String> serviceTypeNames = getServiceTypeNames();
         model.addAttribute("serviceTypeNames", serviceTypeNames);
         model.addAttribute("service", new ServiceDto());
-        return "admin_services";
-    }
-
-    public Map<String, String> getServiceTypeNames() {
-        Map<String, String> serviceTypeNames = new HashMap<>();
-        serviceTypeNames.put("MAINTENANCE", "Техническое обслуживание");
-        serviceTypeNames.put("DIAGNOSTICS", "Диагностика");
-        serviceTypeNames.put("TRANSMISSION_REPAIR", "Ремонт трансмиссии");
-        serviceTypeNames.put("ENGINE_REPAIR", "Ремонт двигателя");
-        serviceTypeNames.put("DIESEL_ENGINE_REPAIR", "Ремонт дизельных двигателей");
-        serviceTypeNames.put("ELECTRICAL_EQUIPMENT_REPAIR", "Ремонт электрооборудования");
-        serviceTypeNames.put("SUSPENSION_REPAIR", "Ремонт ходовой");
-        serviceTypeNames.put("STEERING_REPAIR", "Ремонт рулевого управления");
-        serviceTypeNames.put("BRAKE_SYSTEM_REPAIR", "Ремонт тормозной системы");
-        serviceTypeNames.put("BODY_PAINTING", "Покраска кузова");
-        serviceTypeNames.put("DETAILING", "Детейлинг");
-        serviceTypeNames.put("BODYWORK_REPAIR", "Кузовной ремонт");
-        serviceTypeNames.put("GLASS_REPLACEMENT", "Замена стекол");
-        return serviceTypeNames;
+        return "admin/admin_services";
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -191,5 +171,56 @@ public class AdminController {
         }
         serviceService.updatePriceByName(updatable_service_name, updatable_service_price);
         return "redirect:/admin/services";
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping(path = "/admin/services/delete-finally")
+    public String deleteFinallyService(@RequestParam(name = "finallyDeletableServiceId") Long serviceId,
+                                       RedirectAttributes redirectAttributes) {
+        List<OrderEntity> allOrders = orderService.findAll();
+
+        if(allOrders.stream()
+                .anyMatch(orderEntity -> orderEntity.getServiceEntity().stream()
+                        .anyMatch(serviceEntity -> serviceEntity.getId().equals(serviceId))))
+        {
+            redirectAttributes.addFlashAttribute("error_delete", "Заказы с такой услугой еще есть");
+            return "redirect:/admin/services";
+        }
+
+        serviceService.deleteFinally(serviceId);
+
+        return "redirect:/admin/services";
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping(path = "/admin/services/undelete-service")
+    public String deleteFinallyService(@RequestParam(name = "unDeleteServiceId") Long serviceId) {
+        serviceService.undelete(serviceId);
+
+        return "redirect:/admin/services";
+    }
+
+    public Map<String, String> getServiceTypeNames() {
+        Map<String, String> serviceTypeNames = new HashMap<>();
+        serviceTypeNames.put("MAINTENANCE", "Техническое обслуживание");
+        serviceTypeNames.put("DIAGNOSTICS", "Диагностика");
+        serviceTypeNames.put("TRANSMISSION_REPAIR", "Ремонт трансмиссии");
+        serviceTypeNames.put("ENGINE_REPAIR", "Ремонт двигателя");
+        serviceTypeNames.put("DIESEL_ENGINE_REPAIR", "Ремонт дизельных двигателей");
+        serviceTypeNames.put("ELECTRICAL_EQUIPMENT_REPAIR", "Ремонт электрооборудования");
+        serviceTypeNames.put("SUSPENSION_REPAIR", "Ремонт ходовой");
+        serviceTypeNames.put("STEERING_REPAIR", "Ремонт рулевого управления");
+        serviceTypeNames.put("BRAKE_SYSTEM_REPAIR", "Ремонт тормозной системы");
+        serviceTypeNames.put("BODY_PAINTING", "Покраска кузова");
+        serviceTypeNames.put("DETAILING", "Детейлинг");
+        serviceTypeNames.put("BODYWORK_REPAIR", "Кузовной ремонт");
+        serviceTypeNames.put("GLASS_REPLACEMENT", "Замена стекол");
+        return serviceTypeNames;
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping(path = "/admin")
+    public String getAdminPage() {
+        return "../static/admin";
     }
 }

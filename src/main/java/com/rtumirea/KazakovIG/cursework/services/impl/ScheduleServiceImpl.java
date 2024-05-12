@@ -159,4 +159,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         return firstMonth.getMonth().equals(lastMonth.getMonth()) &&
                 firstMonth.getYear() == lastMonth.getYear();
     }
+
+    @Override
+    public boolean isEmpty() {
+        return StreamSupport.stream(scheduleRepository.findAll().spliterator(),
+                false).findAny().isEmpty();
+    }
 }

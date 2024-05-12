@@ -63,7 +63,7 @@ public class ClientProfileController {
 
     @PreAuthorize("hasAuthority('ROLE_CLIENT')")
     @GetMapping(path = "/profile")
-    public String listCars(Model model) {
+    public String getProfile(Model model) {
         List<CarEntity> carEntities = carService.findCurrentUserCars();
         CarDto carDto = new CarDto();
         model.addAttribute("listCars", carEntities.stream()
@@ -97,6 +97,7 @@ public class ClientProfileController {
         model.addAttribute("statusesTypeNames", getStatusesTypeNames());
 
         List<ScheduleEntity> freeSlots = scheduleService.getFreeSlots();
+        freeSlots.sort(Comparator.comparing(ScheduleEntity::getId));
         model.addAttribute("freeSlots", freeSlots);
 
         List<LocalDate> freeSlotsDays = freeSlots.stream()
@@ -113,9 +114,10 @@ public class ClientProfileController {
         List<ScheduleDto> clientSlotsDto = clientSlotsEntities
                 .stream().map(scheduleMapper::mapTo)
                 .collect(Collectors.toList());
+        clientSlotsDto.sort(Comparator.comparing(ScheduleDto::getId));
         model.addAttribute("clientSlots", clientSlotsDto);
 
-        return "profile";
+        return "client/profile";
     }
 
     @PreAuthorize("hasAuthority('ROLE_CLIENT')")
@@ -133,7 +135,12 @@ public class ClientProfileController {
 
     @PreAuthorize("hasAuthority('ROLE_CLIENT')")
     @PostMapping(path = "/profile/new-car")
-    public String addCar(@ModelAttribute("car") CarDto carDto) {
+    public String addCar(@ModelAttribute("car") CarDto carDto, RedirectAttributes redirectAttributes) {
+        if(carService.findByStateNumber(carDto.getStateNumber()).isPresent()) {
+            redirectAttributes.addFlashAttribute("error_existing_car",
+                    "Машина с таким ГосНомером уже добавлена");
+            return "redirect:/profile";
+        }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userPhoneNumber = authentication.getName();
         CarEntity carEntity = carMapper.mapFrom(carDto);

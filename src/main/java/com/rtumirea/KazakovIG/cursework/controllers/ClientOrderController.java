@@ -73,7 +73,7 @@ public class ClientOrderController {
         model.addAttribute("servicesByType", servicesByType);
         Map<String, String> serviceTypeNames = getServiceTypeNames();
         model.addAttribute("serviceTypeNames", serviceTypeNames);
-        return "client_orders";
+        return "client/client_orders";
     }
 
     @PreAuthorize("hasAuthority('ROLE_CLIENT')")
@@ -92,7 +92,7 @@ public class ClientOrderController {
         userService.incrementOrderNum(autoMechToOrder);
 
         orderService.createOrder(orderEntity);
-        return "redirect:/profile/orders";
+        return "redirect:/profile";
     }
 
 

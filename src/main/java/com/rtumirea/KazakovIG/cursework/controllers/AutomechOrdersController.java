@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,7 +48,7 @@ public class AutomechOrdersController {
 
     @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")
     @GetMapping(path = "/automech/orders")
-    public String getPendingOrders(Model model) {
+    public String getOrdersToAutomech(Model model) {
         List<OrderEntity> automechOrdersEntities = orderService.findByCurrentAutomechAndStatus(OrderStatus.PENDING);
         List<OrderDtoTo> automechOrdersDto = automechOrdersEntities
                 .stream().map(orderMapperTo::mapTo)
@@ -58,6 +59,7 @@ public class AutomechOrdersController {
         List<ScheduleDto> automechSlotsDto = automechSlotsEntities
                 .stream().map(scheduleMapper::mapTo)
                 .collect(Collectors.toList());
+        automechSlotsDto.sort(Comparator.comparing(ScheduleDto::getId));
         List<ScheduleDto> automechSlotsNonCompleted = automechSlotsDto.stream().filter(
                 automechSlotsEntity -> !automechSlotsEntity.getOrderEntity().getOrderStatus()
                         .equals(OrderStatus.COMPLETED)).collect(Collectors.toList());
@@ -68,7 +70,7 @@ public class AutomechOrdersController {
         model.addAttribute("automechSlotsNonCompleted", automechSlotsNonCompleted);
         model.addAttribute("automechSlotsCompleted", automechSlotsCompleted);
 
-        return "automech_orders";
+        return "automech/automech_orders";
     }
 
     @PreAuthorize("hasAuthority('ROLE_AUTOMECH')")

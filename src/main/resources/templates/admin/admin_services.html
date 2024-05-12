@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html style="font-size: 16px;" lang="ru"><head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>Управление услугами</title>
+    <link rel="stylesheet" href="../../static/css/nicepage.css" th:href="@{/css/nicepage.css}" media="screen">
+<link rel="stylesheet" href="../../static/css/admin_services.css" th:href="@{/css/admin_services.css}" media="screen">
+    <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
+
+    <meta name="theme-color" content="#478ac9">
+  <body data-path-to-root="./" data-include-products="false" class="u-body u-xl-mode" data-lang="ru"><header class="u-clearfix u-header u-header" id="sec-fcf8"><div class="u-clearfix u-sheet u-sheet-1">
+        <a href="automechs" class="u-active-none u-border-2 u-border-no-left u-border-no-right u-border-no-top u-border-palette-1-base u-btn u-btn-rectangle u-button-style u-hover-none u-none u-btn-1">Автомеханики </a>
+        <a href="schedule" class="u-active-none u-border-2 u-border-no-left u-border-no-right u-border-no-top u-border-palette-1-base u-btn u-btn-rectangle u-button-style u-hover-none u-none u-btn-2">Расписание </a>
+      </div></header>
+    <section class="u-clearfix u-container-align-center u-section-1" id="sec-95b6">
+      <div class="u-clearfix u-sheet u-sheet-1">
+        <div class="u-border-3 u-border-palette-1-base u-container-style u-group u-group-1">
+          <div class="u-container-layout u-container-layout-1">
+            <div class="u-align-center u-form u-form-1">
+              <form action="#" th:action="@{/admin/services/new-service}" th:object="${service}" method="POST" class="u-clearfix u-form-horizontal u-form-spacing-10 u-inner-form" name="form" style="padding: 10px;">
+                <div class="u-form-group u-form-select u-label-none u-form-group-1">
+                  <label for="select-2b01a" class="u-label">Выпадающий список</label>
+                  <div class="u-form-select-wrapper">
+                    <select th:field="*{serviceType}" id="select-2b01a" name="select" class="u-input u-input-rectangle">
+                      <option th:each="type : ${T(com.rtumirea.KazakovIG.cursework.domain.enums.ServiceType).values()}"
+                              th:value="${type}" th:text="${serviceTypeNames[__${type}__]}"></option>
+                    </select>
+                    <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px" viewBox="0 0 16 16" style="fill:currentColor;" xml:space="preserve"><polygon class="st0" points="8,12 2,4 14,4 "></polygon></svg>
+                  </div>
+                </div>
+                <div class="u-form-email u-form-group u-label-none">
+                  <label for="email-ee03" class="u-label">Эл. почта</label>
+                  <input type="text" th:field="*{name}" placeholder="Введите название услуги" required id="email-ee03" name="email" class="u-input u-input-rectangle">
+                </div>
+                <div class="u-form-group u-label-none u-form-group-3">
+                  <label for="text-a6ebcc" class="u-label">Поле ввода</label>
+                  <input type="number" th:field="*{price}" placeholder="Введите цену услуги" required id="text-a6ebcc" name="text" class="u-input u-input-rectangle">
+                </div>
+                <div class="u-align-left u-form-group u-form-submit u-label-none">
+                  <button type="submit" class="u-btn u-btn-submit u-button-style">Добавить услугу</button>
+                </div>
+                <div th:if="${error_service_name}" th:text="${error_service_name}" style="color: red"></div>
+              </form>
+            </div>
+            <div class="custom-expanded u-form u-form-2">
+              <form action="#" th:action="@{/admin/services/delete-service}" method="POST" class="u-clearfix u-form-horizontal u-form-spacing-10 u-inner-form" name="form" style="padding: 10px;">
+                <div class="u-form-group u-form-select u-label-none u-form-group-5">
+                  <label for="select-2b012" class="u-label">Выпадающий список</label>
+                  <div class="u-form-select-wrapper">
+                    <select id="select-2b012" name="deletable_service_name" class="u-input u-input-rectangle">
+                      <option disabled selected th:value="error">Выберите услугу</option>
+                      <th:block th:each="entry : ${servicesByType}">
+                        <option disabled th:text="'--' + ${serviceTypeNames[__${entry.key}__]} + '--'"></option>
+                        <th:block th:each="service : ${entry.value}">
+                          <option th:value="${service.name}" th:text="${service.name}"></option>
+                        </th:block>
+                      </th:block>
+                    </select>
+                    <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px" viewBox="0 0 16 16" style="fill:currentColor;" xml:space="preserve"><polygon class="st0" points="8,12 2,4 14,4 "></polygon></svg>
+                  </div>
+                </div>
+                <div class="u-align-left u-form-group u-form-submit u-label-none">
+                  <button type="submit" class="u-btn u-btn-submit u-button-style">Удалить сервис</button>
+                </div>
+                <div th:if="${error_delete_service}" style="color: red;" th:text="${error_delete_service}"></div>
+                <input type="hidden" value="" name="recaptchaResponse">
+                <input type="hidden" name="formServices" value="797c919f-d909-c126-962e-ba83c95a0a01">
+              </form>
+            </div>
+            <div class="custom-expanded u-form u-form-3">
+              <form action="#" th:action="@{/admin/services/update-cost}" method="POST" class="u-clearfix u-form-horizontal u-form-spacing-10 u-inner-form" name="form" style="padding: 10px;">
+                <div class="u-form-group u-form-select u-label-none u-form-group-7">
+                  <label for="select-2b01" class="u-label">Выпадающий список</label>
+                  <div class="u-form-select-wrapper">
+                    <select id="select-2b01" name="updatable_service_name" class="u-input u-input-rectangle">
+                      <option disabled selected th:value="error">Выберите услугу</option>
+                      <th:block th:each="entry : ${servicesByType}">
+                        <option disabled th:text="'--' + ${serviceTypeNames[__${entry.key}__]} + '--'"></option>
+                        <th:block th:each="service : ${entry.value}">
+                          <option th:value="${service.name}" th:text="${service.name}"></option>
+                        </th:block>
+                      </th:block>
+                    </select>
+                    <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px" viewBox="0 0 16 16" style="fill:currentColor;" xml:space="preserve"><polygon class="st0" points="8,12 2,4 14,4 "></polygon></svg>
+                  </div>
+                </div>
+                <div class="u-form-group u-label-none u-form-group-8">
+                  <label for="text-a6eb" class="u-label">Поле ввода</label>
+                  <input type="number" name="updatable_service_price" placeholder="Введите новую цену услуги" required id="text-a6eb" class="u-input u-input-rectangle">
+                </div>
+                <div class="u-align-left u-form-group u-form-submit u-label-none">
+                  <button type="submit" class="u-btn u-btn-submit u-button-style">Обновить цену услуги</button>
+                </div>
+                <div th:if="${error_update_service}" style="color: red" th:text="${error_update_service}"></div>
+                <input type="hidden" value="" name="recaptchaResponse">
+                <input type="hidden" name="formServices" value="797c919f-d909-c126-962e-ba83c95a0a01">
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="u-expanded-width u-table u-table-responsive u-table-1" th:each="entry : ${servicesByType}">
+          <h3 class="u-text u-text-default u-text-1" th:text="${serviceTypeNames[__${entry.key}__]}"></h3>
+          <table class="u-table-entity">
+            <colgroup>
+              <col width="25%">
+              <col width="25%">
+              <col width="25%">
+              <col width="25%">
+            </colgroup>
+            <tbody class="u-table-body">
+              <tr style="height: 64px;">
+                <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell">Название услуги</td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell">Цена услуги</td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell"></td>
+              </tr>
+              <tr style="height: 65px;" th:each="service : ${entry.value}">
+                <td class="u-border-1 u-border-grey-30 u-table-cell">
+                  <form th:if="${service.deletable}" th:action="@{/admin/services/undelete-service}" method="POST">
+                    <button type="submit" name="unDeleteServiceId" th:value="${service.id}">Отменить удаление</button>
+                  </form>
+                </td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell">
+                  <span th:if="${service.deletable}">
+                      <s th:text="${service.name}"></s>
+                  </span>
+                  <span th:unless="${service.deletable}" th:text="${service.name}"></span>
+                </td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${service.price}"><s th:if="${service.deletable}"></s></td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell">
+                  <form th:if="${service.deletable}" th:action="@{/admin/services/delete-finally}" method="POST">
+                    <button type="submit" name="finallyDeletableServiceId" th:value="${service.id}">Окончательно удалить услугу</button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <section class="u-align-center u-clearfix u-section-2" id="sec-67b9">
+      <div class="u-clearfix u-sheet u-valign-middle u-sheet-1"></div>
+    </section>
+    <section class="u-align-center u-clearfix u-section-3" id="sec-c227">
+      <div class="u-clearfix u-sheet u-valign-middle u-sheet-1"></div>
+    </section>
+    
+    
+    
+    <footer class="u-align-center u-clearfix u-footer u-grey-80 u-footer" id="sec-3d3f"><div class="u-clearfix u-sheet u-sheet-1">
+        <p class="u-small-text u-text u-text-variant u-text-1">Казаков Илья Геннадьевич ИКБО-36-22 </p>
+      </div></footer>
+    <section class="u-backlink u-clearfix u-grey-80">
+    </section>
+  
+</body></html>

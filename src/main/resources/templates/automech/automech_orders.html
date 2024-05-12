@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html style="font-size: 16px;" lang="ru"><head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>Заказы</title>
+  <link rel="stylesheet" href="../../static/css/nicepage.css" th:href="@{/css/nicepage.css}" media="screen">
+  <link rel="stylesheet" href="../../static/css/automech_orders.css" th:href="@{/css/automech_orders.css}" media="screen">
+    <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
+
+    <meta name="theme-color" content="#478ac9">
+  <body data-path-to-root="./" data-include-products="false" class="u-body u-xl-mode" data-lang="ru">
+<header class="u-clearfix u-header u-header" id="sec-fcf8"><div class="u-clearfix u-sheet u-sheet-1"></div>
+</header>
+    <section class="u-clearfix u-section-1" id="sec-b04c">
+      <div class="u-clearfix u-sheet u-sheet-1" th:if="${!orders.isEmpty()}">
+        <h3 class="u-align-center u-text u-text-default u-text-1">Новые заказы</h3>
+        <div class="custom-expanded u-align-center u-table u-table-responsive u-table-1">
+          <table class="u-table-entity">
+            <colgroup>
+              <col width="14.3%">
+              <col width="14.3%">
+              <col width="14.3%">
+              <col width="14.3%">
+              <col width="14.6%">
+              <col width="14.200000000000006%">
+              <col width="13.900000000000006%">
+            </colgroup>
+            <thead class="u-black u-table-header u-table-header-1">
+              <tr style="height: 21px;">
+                <th class="u-border-1 u-border-black u-table-cell">Номер заказа </th>
+                <th class="u-border-1 u-border-black u-table-cell">Клиент</th>
+                <th class="u-border-1 u-border-black u-table-cell">Машина</th>
+                <th class="u-border-1 u-border-black u-table-cell">Услуги</th>
+                <th class="u-border-1 u-border-black u-table-cell">Есть ли деталь на складе?</th>
+                <th class="u-border-1 u-border-black u-table-cell">Примерное время работы (мин.)</th>
+                <th class="u-border-1 u-border-black u-table-cell">Обработка заказа</th>
+              </tr>
+            </thead>
+            <tbody class="u-table-body">
+              <tr style="height: 75px;" th:each="order, index : ${orders}">
+                <form th:object="${order}" th:action="@{/automech/orders/update-order}" method="POST">
+                  <input type="hidden" th:name="|id|" th:value="${order.id}" />
+                  <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${order.id}"></td>
+                  <td class="u-border-1 u-border-grey-30 u-table-cell">
+                    <ul>
+                      <li th:text="'Имя: ' + ${order.carEntity.userEntity.name}"></li>
+                      <li th:text="'Номер телефона: ' + ${order.carEntity.userEntity.phoneNumber}"></li>
+                    </ul>
+                  </td>
+                  <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${order.carEntity.make + ' ' + order.carEntity.bodyType + ' ' + order.carEntity.stateNumber}"></td>
+                  <td class="u-border-1 u-border-grey-30 u-table-cell">
+                    <ul th:each="service : ${order.serviceEntity}">
+                      <li th:text="${service.name}"></li>
+                      <input type="hidden" th:name="|serviceIds|" th:value="${service.id}" />
+                    </ul>
+                  </td>
+                  <td class="u-border-1 u-border-grey-30 u-table-cell">
+                    <input type="checkbox" th:id="'detailsCheckbox' + ${index.index}" th:onclick="'toggleDisabled(' + ${index.index} + ')'" name="detailsCheckbox" checked="checked"/>
+                    <input required th:name="|detailsWaiting|" type="number" th:id="'detailsWaitingTime' + ${index.index}" placeholder="Сколько дней?" disabled/>
+                  </td>
+                  <td class="u-border-1 u-border-grey-30 u-table-cell">
+                    <input required th:name="|workingTime|" type="number" th:id="'workingTime' + ${index.index}" placeholder="Примерное время работы" />
+                  </td>
+                  <td class="u-border-1 u-border-grey-30 u-table-cell">
+                    <button type="submit">Обработать заказ</button>
+                  </td>
+                </form>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <section class="u-align-center u-clearfix u-section-2" id="sec-1ae9">
+      <div class="u-clearfix u-sheet u-sheet-1" th:if="${!automechSlotsNonCompleted.isEmpty()}">
+        <h3 class="u-align-center u-text u-text-default u-text-1">Предстоящие записи</h3>
+        <div class="custom-expanded u-align-center u-table u-table-responsive u-table-1">
+          <table class="u-table-entity">
+            <colgroup>
+              <col width="12.4%">
+              <col width="12.4%">
+              <col width="12.4%">
+              <col width="12.4%">
+              <col width="12.7%">
+              <col width="12.4%">
+              <col width="12.300000000000002%">
+              <col width="13.200000000000003%">
+            </colgroup>
+            <thead class="u-black u-table-header u-table-header-1">
+              <tr style="height: 21px;">
+                <th class="u-border-1 u-border-black u-table-cell">Дата</th>
+                <th class="u-border-1 u-border-black u-table-cell">Время</th>
+                <th class="u-border-1 u-border-black u-table-cell">Номер заказа</th>
+                <th class="u-border-1 u-border-black u-table-cell">Машина</th>
+                <th class="u-border-1 u-border-black u-table-cell">Клиент</th>
+                <th class="u-border-1 u-border-black u-table-cell">Услуги</th>
+                <th class="u-border-1 u-border-black u-table-cell">Время работы</th>
+                <th class="u-border-1 u-border-black u-table-cell">Обработка заказа</th>
+                <th class="u-border-1 u-border-black u-table-cell">Заказ готов</th>
+              </tr>
+            </thead>
+            <tbody class="u-table-body" th:each="slot : ${automechSlotsNonCompleted}">
+              <tr style="height: 75px;">
+                <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${#temporals.format(slot.day, 'dd.MM.yy')}"></td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${slot.orderEntity.id}"></td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${slot.orderEntity.carEntity.make + ' ' + slot.orderEntity.carEntity.bodyType + ' ' + slot.orderEntity.carEntity.stateNumber}"></td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${slot.orderEntity.carEntity.userEntity.name + ' (' + slot.orderEntity.carEntity.userEntity.phoneNumber + ')'}"></td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell">
+                  <table>
+                    <thead>
+                    <tr>
+                      <th>Название услуги</th>
+                      <th>Цена</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="service : ${slot.orderEntity.serviceEntity}">
+                      <td th:text="${service.name}"></td>
+                      <td th:text="${service.price}"></td>
+                      <td></td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${slot.orderEntity.workingTime}"></td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell">
+                  <form th:action="@{/automech/orders/car-ready}" method="POST" th:if="${!slot.orderEntity.carEntity.carReady}">
+                    <button type="submit" name="carReady" th:value="${slot.orderEntity.id}">Клиент привез машину</button>
+                  </form>
+                  <form th:action="@{/automech/orders/car-unready}" method="POST" th:if="${slot.orderEntity.carEntity.carReady}">
+                    <button type="submit" name="carReady" th:value="${slot.orderEntity.id}">Клиент увез машину</button>
+                  </form>
+                </td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell" th:if="${slot.orderEntity.carEntity.carReady}">
+                  <form th:action="@{/automech/orders/order-ready}" method="POST">
+                    <button type="submit" name="orderReady" th:value="${slot.orderEntity.id}">Заказ готов</button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <section class="u-clearfix u-section-3" id="sec-7d6a">
+      <div class="u-clearfix u-sheet u-sheet-1" th:if="${!automechSlotsCompleted.isEmpty()}">
+        <h3 class="u-align-center u-text u-text-default u-text-1">Готовые к выдаче заказы </h3>
+        <div class="custom-expanded u-align-center u-table u-table-responsive u-table-1">
+          <table class="u-table-entity">
+            <colgroup>
+              <col width="12.4%">
+              <col width="12.4%">
+              <col width="12.4%">
+              <col width="12.4%">
+              <col width="12.7%">
+              <col width="12.4%">
+              <col width="12.300000000000002%">
+              <col width="13.200000000000003%">
+            </colgroup>
+            <thead class="u-black u-table-header u-table-header-1">
+              <tr style="height: 21px;">
+                <th class="u-border-1 u-border-black u-table-cell">Дата</th>
+                <th class="u-border-1 u-border-black u-table-cell">Время</th>
+                <th class="u-border-1 u-border-black u-table-cell">Номер заказа</th>
+                <th class="u-border-1 u-border-black u-table-cell">Машина</th>
+                <th class="u-border-1 u-border-black u-table-cell">Клиент</th>
+                <th class="u-border-1 u-border-black u-table-cell">Услуги</th>
+                <th class="u-border-1 u-border-black u-table-cell">Время работы</th>
+                <th class="u-border-1 u-border-black u-table-cell">Обработка заказа</th>
+              </tr>
+            </thead>
+            <tbody class="u-table-body">
+              <tr style="height: 75px;" th:each="slot : ${automechSlotsCompleted}">
+                <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${#temporals.format(slot.day, 'dd.MM.yy')}"></td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${#temporals.format(slot.startTime, 'HH:mm')}"></td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${slot.orderEntity.id}"></td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${slot.orderEntity.carEntity.make + ' ' + slot.orderEntity.carEntity.bodyType + ' ' + slot.orderEntity.carEntity.stateNumber}"></td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${slot.orderEntity.carEntity.userEntity.name + ' (' + slot.orderEntity.carEntity.userEntity.phoneNumber + ')'}"></td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell">
+                  <table>
+                    <thead>
+                    <tr>
+                      <th>Название услуги</th>
+                      <th>Цена</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="service : ${slot.orderEntity.serviceEntity}">
+                      <td th:text="${service.name}"></td>
+                      <td th:text="${service.price}"></td>
+                      <td></td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell" th:text="${slot.orderEntity.workingTime}"></td>
+                <td class="u-border-1 u-border-grey-30 u-table-cell">
+                  <form th:action="@{/automech/orders/delete-order}" method="POST" th:if="${slot.orderEntity.carEntity.carReady}">
+                    <button type="submit" name="deleteOrder" th:value="${slot.orderEntity.id}">Завершить заказ</button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+<script th:inline="javascript">
+  function toggleDisabled(index) {
+    // Получаем чекбокс
+    const checkbox = document.getElementById('detailsCheckbox' + index);
+    // Получаем второй ввод
+    const input = document.getElementById('detailsWaitingTime' + index);
+
+    // Если чекбокс отмечен, выключаем второй ввод, иначе включаем
+    if (checkbox.checked) {
+      input.disabled = true;
+    } else {
+      input.disabled = false;
+    }
+  }
+</script>
+    
+    
+    <footer class="u-align-center u-clearfix u-footer u-grey-80 u-footer" id="sec-3d3f"><div class="u-clearfix u-sheet u-sheet-1">
+        <p class="u-small-text u-text u-text-variant u-text-1">Казаков Илья Геннадьевич ИКБО-36-22 </p>
+      </div></footer>
+    <section class="u-backlink u-clearfix u-grey-80">
+      <p class="u-text">
+        <span>This site was created with the </span>
+        <a class="u-link" href="https://nicepage.com/" target="_blank" rel="nofollow">
+          <span>Nicepage</span>
+        </a>
+      </p>
+    </section>
+  
+</body></html>

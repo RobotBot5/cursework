@@ -46,7 +46,7 @@ public class UserController {
         }
         if(!userDto.getPassword().equals(passwordCheck)) {
             redirectAttributes.addFlashAttribute("error", "Пароль должен совпадать");
-            return "redirect:/admin/automechs";
+            return "redirect:/register";
         }
 
         userDto.setRoles("ROLE_CLIENT");
@@ -60,29 +60,14 @@ public class UserController {
         return "redirect:/profile";
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @PostMapping(path = "/new-automech")
-    public String addAutomech(@ModelAttribute("user") UserDto userDto, HttpServletRequest request, RedirectAttributes redirectAttributes,
-                              @RequestParam(name = "password_check") String passwordCheck) {
-        if(userService.isUserExists(userDto.getPhoneNumber())) {
-            redirectAttributes.addFlashAttribute("error", "Номер телефона уже зарегистрирован");
-            return "redirect:/admin/automechs";
-        }
-        if(!userDto.getPassword().equals(passwordCheck)) {
-            redirectAttributes.addFlashAttribute("error", "Пароль должен совпадать");
-            return "redirect:/admin/automechs";
-        }
-
-        userDto.setRoles("ROLE_AUTOMECH");
-        userDto.setOrdersNum(0);
-        UserEntity userEntity = userMapper.mapFrom(userDto);
-        userService.addUser(userEntity);
-        return "redirect:/admin/automechs";
-    }
-
     @GetMapping(path = "/login")
     public String login() {
-        return "login";
+        if(scheduleService.isEmpty())
+            scheduleService.generateScheduleForMonth(LocalDate.of(2024, 5, 1), 120);
+        if(!userService.isUserExists("admin"))
+            userService.createAdmin("admin");
+
+        return "/security/login";
     }
 
     @GetMapping(path = "/register")
@@ -90,11 +75,6 @@ public class UserController {
         UserDto userDto = new UserDto();
         model.addAttribute("user", userDto);
 
-//        scheduleService.generateScheduleForMonth(LocalDate.of(2024, 5, 1), 120);
-//        userService.createAdmin("admin");
-
-
-
-        return "register";
+        return "/security/register";
     }
 }

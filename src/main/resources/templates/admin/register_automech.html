@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html style="font-size: 16px;" lang="ru">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <title>Управление автомеханиками</title>
+  <link rel="stylesheet" href="../../static/css/nicepage.css" th:href="@{/css/nicepage.css}" media="screen">
+  <link rel="stylesheet" href="../../static/css/register_automech.css" th:href="@{/css/register_automech.css}" media="screen">
+  <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
+  <meta name="theme-color" content="#478ac9">
+</head>
+  <body data-path-to-root="./" data-include-products="false" class="u-body u-xl-mode" data-lang="ru">
+  <header class="u-clearfix u-header u-header" id="sec-fcf8">
+    <div class="u-clearfix u-sheet u-sheet-1">
+        <a href="services" class="u-active-none u-border-2 u-border-no-left u-border-no-right u-border-no-top u-border-palette-1-base u-btn u-btn-rectangle u-button-style u-hover-none u-none u-btn-1">Услуги</a>
+        <a href="schedule" class="u-active-none u-border-2 u-border-no-left u-border-no-right u-border-no-top u-border-palette-1-base u-btn u-btn-rectangle u-button-style u-hover-none u-none u-btn-2">Расписание</a>
+    </div>
+  </header>
+    <section class="u-clearfix u-section-1" id="sec-dc0d">
+      <div class="u-clearfix u-sheet u-sheet-1">
+        <h3 class="u-text u-text-default u-text-1">Список автомехаников</h3>
+        <div class="u-expanded-width u-table u-table-responsive u-table-1">
+          <table class="u-table-entity">
+            <colgroup>
+              <col width="25%">
+              <col width="25%">
+              <col width="25%">
+              <col width="25%">
+            </colgroup>
+            <thead class="u-palette-1-base u-table-header u-table-header-1">
+              <tr style="height: 20px;">
+                <th class="u-table-cell">Id </th>
+                <th class="u-table-cell">Номер телефона </th>
+                <th class="u-table-cell">Имя</th>
+                <th class="u-table-cell">Кол-во заказов</th>
+              </tr>
+            </thead>
+            <tbody class="u-table-alt-palette-1-light-3 u-table-body">
+              <tr style="height: 76px;" th:each="automech : ${automechs}">
+                <td class="u-table-cell" th:text="${automech.id}"></td>
+                <td class="u-table-cell" th:text="${automech.phoneNumber}"></td>
+                <td class="u-table-cell" th:text="${automech.name}"></td>
+                <td class="u-table-cell" th:text="${automech.ordersNum}"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    <section class="u-align-center u-clearfix u-section-2" id="sec-3f4e">
+      <div class="u-clearfix u-sheet u-sheet-1">
+        <h3 class="u-text u-text-default u-text-1">Создать аккаунт автомеханика</h3>
+        <div class="u-align-center u-form u-form-1">
+          <form action="#" th:action="@{/admin/automechs/new-automech}" th:object="${user}" method="POST" class="u-clearfix u-form-horizontal u-form-spacing-10 u-inner-form" name="form" style="padding: 10px;">
+            <div class="u-form-email u-form-group u-label-none">
+              <label for="email-79fa" class="u-label">Эл. почта</label>
+              <input type="text" th:field="*{phoneNumber}" pattern="8\d{10}" placeholder="Введите номер телефона механика" required id="email-79fa" name="email" class="u-input u-input-rectangle">
+            </div>
+            <div class="u-form-group u-label-none u-form-group-2">
+              <label for="text-cd52" class="u-label">Поле ввода</label>
+              <input type="text" th:field="*{name}" placeholder="Введите Ваше имя" required id="text-cd52" name="text" class="u-input u-input-rectangle">
+            </div>
+            <div class="u-form-group u-label-none u-form-group-3">
+              <label for="text-5a5a" class="u-label">Поле ввода</label>
+              <input type="password" th:field="*{password}" placeholder="Введите пароль" required id="text-5a5a" name="text-1" class="u-input u-input-rectangle">
+            </div>
+            <div class="u-form-group u-label-none u-form-group-4">
+              <label for="text-9433" class="u-label">Поле ввода</label>
+              <input type="password" name="password_check" placeholder="Введите пароль еще раз" required id="text-9433" class="u-input u-input-rectangle">
+            </div>
+            <div class="u-align-left u-form-group u-form-submit u-label-none">
+              <button type="submit" class="u-btn u-btn-submit u-button-style">Создать</button>
+            </div>
+            <div th:if="${error}" style="color: red;" th:text="${error}"></div>
+            <input type="hidden" value="" name="recaptchaResponse">
+            <input type="hidden" name="formServices" value="797c919f-d909-c126-962e-ba83c95a0a01">
+          </form>
+        </div>
+        <h3 class="u-text u-text-default u-text-2">Удалить аккаунт автомеханика<br>
+        </h3>
+        <div class="u-align-center u-form u-form-2">
+          <form action="#" th:action="@{/admin/automechs/delete-automech}" method="POST" class="u-clearfix u-form-horizontal u-form-spacing-10 u-inner-form" name="form-1" style="padding: 10px;">
+            <div class="u-form-group u-form-select u-label-none u-form-group-6">
+              <label for="select-e532" class="u-label">Выпадающий список</label>
+              <div class="u-form-select-wrapper">
+                <select id="select-e532" name="deletableAutomechId" class="u-input u-input-rectangle">
+                  <option th:each="automech : ${automechs}" th:text="'Id:' + ${automech.id}" th:value="${automech.id}"></option>
+                </select>
+                <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px" viewBox="0 0 16 16" style="fill:currentColor;" xml:space="preserve"><polygon class="st0" points="8,12 2,4 14,4 "></polygon></svg>
+              </div>
+            </div>
+            <div class="u-align-left u-form-group u-form-submit u-label-none">
+              <button type="submit" class="u-btn u-btn-submit u-button-style">Удалить</button>
+            </div>
+            <input type="hidden" value="" name="recaptchaResponse">
+            <input type="hidden" name="formServices" value="797c919f-d909-c126-962e-ba83c95a0a01">
+          </form>
+        </div>
+      </div>
+    </section>
+    
+    
+    
+    <footer class="u-align-center u-clearfix u-footer u-grey-80 u-footer" id="sec-3d3f"><div class="u-clearfix u-sheet u-sheet-1">
+        <p class="u-small-text u-text u-text-variant u-text-1">Казаков Илья Геннадьевич ИКБО-36-22 </p>
+      </div></footer>
+    <section class="u-backlink u-clearfix u-grey-80">
+      <p class="u-text">
+        <span>This site was created with the </span>
+        <a class="u-link" href="https://nicepage.com/" target="_blank" rel="nofollow">
+          <span>Nicepage</span>
+        </a>
+      </p>
+    </section>
+  
+</body></html>

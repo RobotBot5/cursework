@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html style="font-size: 16px;" lang="ru"><head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>Список услуг</title>
+    <link rel="stylesheet" href="../../static/css/nicepage.css" th:href="@{/css/nicepage.css}" media="screen">
+    <link rel="stylesheet" href="../../static/css/client_services.css" th:href="@{/css/client_services.css}" media="screen">
+    <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
+
+    <meta name="theme-color" content="#478ac9">
+  <body data-path-to-root="./" data-include-products="false" class="u-body u-xl-mode" data-lang="ru">
+<header class="u-clearfix u-header u-header" id="sec-fcf8">
+    <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
+        <a th:href="@{/profile}" class="u-border-1 u-border-active-palette-2-base u-border-hover-palette-1-base u-border-no-left u-border-no-right u-border-no-top u-btn u-button-style u-none u-text-palette-1-base u-btn-1">Профиль</a>
+    </div>
+</header>
+    <section class="u-clearfix u-section-1" id="sec-7993">
+      <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
+        <h3 class="u-text u-text-default u-text-1">Список услуг</h3>
+      </div>
+    </section>
+    <section class="u-align-center u-clearfix u-section-2" id="sec-240e">
+      <div class="u-clearfix u-sheet u-sheet-1" th:each="entry : ${servicesByType}">
+        <h4 class="u-text u-text-default u-text-1" th:text="${serviceTypeNames[__${entry.key}__]}"></h4>
+        <div class="custom-expanded u-table u-table-responsive u-table-1">
+          <table class="u-table-entity">
+            <colgroup>
+              <col width="50%">
+              <col width="50%">
+            </colgroup>
+            <tbody class="u-table-alt-palette-1-light-3 u-table-body">
+              <tr style="height: 65px;">
+                <td class="u-table-cell">Название услуги</td>
+                <td class="u-table-cell">Цена услуги</td>
+              </tr>
+              <tr style="height: 65px;" th:each="service : ${entry.value}" th:if="${!service.deletable}">
+                  <td class="u-table-cell" th:text="${service.name}"></td>
+                  <td class="u-table-cell" th:text="${service.price}"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+    
+    
+    
+    <footer class="u-align-center u-clearfix u-footer u-grey-80 u-footer" id="sec-3d3f"><div class="u-clearfix u-sheet u-sheet-1">
+        <p class="u-small-text u-text u-text-variant u-text-1">Казаков Илья Геннадьевич ИКБО-36-22 </p>
+      </div></footer>
+    <section class="u-backlink u-clearfix u-grey-80">
+      <p class="u-text">
+        <span>This site was created with the </span>
+        <a class="u-link" href="https://nicepage.com/" target="_blank" rel="nofollow">
+          <span>Nicepage</span>
+        </a>
+      </p>
+    </section>
+  
+</body></html>
