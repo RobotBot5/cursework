@@ -67,7 +67,7 @@ public class UserController {
         if(!userService.isUserExists("admin"))
             userService.createAdmin("admin");
 
-        return "/security/login";
+        return "security/login";
     }
 
     @GetMapping(path = "/register")
@@ -75,6 +75,6 @@ public class UserController {
         UserDto userDto = new UserDto();
         model.addAttribute("user", userDto);
 
-        return "/security/register";
+        return "security/register";
     }
 }
