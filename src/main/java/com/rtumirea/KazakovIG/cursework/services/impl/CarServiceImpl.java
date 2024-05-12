@@ -79,4 +79,9 @@ public class CarServiceImpl implements CarService {
         carEntity.setCarReady(carReady);
         carRepository.save(carEntity);
     }
+
+    @Override
+    public Optional<CarEntity> findByStateNumber(String stateNumber) {
+        return carRepository.findByStateNumber(stateNumber);
+    }
 }

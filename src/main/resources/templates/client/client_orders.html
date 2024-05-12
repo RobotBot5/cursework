@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html style="font-size: 16px;" lang="ru"><head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <title>Оформление заказа</title>
+    <link rel="stylesheet" href="../../static/css/nicepage.css" th:href="@{/css/nicepage.css}" media="screen">
+    <link rel="stylesheet" href="../../static/css/client_orders.css" th:href="@{/css/client_orders.css}" media="screen">
+    <link id="u-theme-google-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i|Open+Sans:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i">
+
+    <meta name="theme-color" content="#478ac9">
+  <body data-path-to-root="./" data-include-products="false" class="u-body u-xl-mode" data-lang="ru">
+<header class="u-clearfix u-header u-header" id="sec-fcf8"><div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
+<a th:href="@{/profile}" class="u-active-none u-border-2 u-border-no-left u-border-no-right u-border-no-top u-border-palette-1-base u-btn u-btn-rectangle u-button-style u-hover-none u-none u-btn-1">Профиль</a>
+</div>
+</header>
+    <section class="u-clearfix u-section-1" id="sec-a067">
+      <div class="u-clearfix u-sheet u-valign-middle u-sheet-1">
+        <div class="u-form u-form-1">
+          <form action="#" th:action="@{/profile/orders/new-order}" th:object="${order}" method="POST" class="u-clearfix u-form-spacing-10 u-form-vertical u-inner-form" name="form" style="padding: 10px;">
+            <div class="u-form-group u-form-select u-form-group-1">
+              <label for="make" class="u-label">Выберете машину</label>
+              <div class="u-form-select-wrapper">
+                <select th:field="*{carId}" id="make" name="select" class="u-input u-input-rectangle">
+                    <option th:each="car : ${client_cars}"
+                            th:value="${car.id}" th:text="${car.make + ' ' + car.bodyType + ' ' + car.stateNumber}"></option>
+                </select>
+                <svg class="u-caret u-caret-svg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="16px" height="16px" viewBox="0 0 16 16" style="fill:currentColor;" xml:space="preserve"><polygon class="st0" points="8,12 2,4 14,4 "></polygon></svg>
+              </div>
+            </div>
+            <div class="u-form-checkbox-group u-form-group u-form-partition-factor-2 u-form-group-2" th:each="entry : ${servicesByType}">
+              <label th:text="${serviceTypeNames[__${entry.key}__]}" class="u-label"></label>
+              <div class="u-form-checkbox-group-wrapper">
+                <div class="u-input-row" th:each="service : ${entry.value}" th:if="${!service.deletable}">
+                  <input type="checkbox" th:field="*{serviceIds}" th:value="${service.id}" th:attr="data-price=${service.price}" name="checkbox[]" value="Item 1" class="u-field-input">
+                  <label th:for="${#ids.prev('serviceIds')}"
+                         th:text="${service.name}" class="u-field-label"></label>
+                </div>
+              </div>
+            </div>
+            <p id="totalPrice" class="u-align-left u-form-group u-form-partition-factor-2 u-form-text u-small-text u-text u-text-variant u-text-1"> Итоговая цена: 0 руб.</p>
+            <div class="u-align-left u-form-group u-form-submit">
+              <button type="submit" class="u-btn u-btn-submit u-button-style">Оформить заказ</button>
+            </div>
+            <div th:if="${error_no_services}" th:text="${error_no_services}" style="color: red"></div>
+            <input type="hidden" value="" name="recaptchaResponse">
+            <input type="hidden" name="formServices" value="797c919f-d909-c126-962e-ba83c95a0a01">
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <script th:inline="javascript">
+        function calculateTotalPrice() {
+            let totalPrice = 0;
+            const checkboxes = document.querySelectorAll('input[type=checkbox]:checked');
+            checkboxes.forEach(function(checkbox) {
+                const servicePrice = parseInt(checkbox.getAttribute('data-price'));
+                totalPrice += servicePrice;
+            });
+            document.getElementById('totalPrice').textContent = 'Итоговая цена: ' + totalPrice + ' руб.';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('input[type=checkbox]');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.addEventListener('change', calculateTotalPrice);
+            });
+        });
+    </script>
+    
+    
+    <footer class="u-align-center u-clearfix u-footer u-grey-80 u-footer" id="sec-3d3f"><div class="u-clearfix u-sheet u-sheet-1">
+        <p class="u-small-text u-text u-text-variant u-text-1">Казаков Илья Геннадьевич ИКБО-36-22 </p>
+      </div></footer>
+    <section class="u-backlink u-clearfix u-grey-80">
+      <p class="u-text">
+        <span>This site was created with the </span>
+        <a class="u-link" href="https://nicepage.com/" target="_blank" rel="nofollow">
+          <span>Nicepage</span>
+        </a>
+      </p>
+    </section>
+
+
+
+</body></html>

@@ -25,4 +25,6 @@ public interface ScheduleService {
     void deleteLastMonth();
 
     boolean existOnlyOneMonth();
+
+    boolean isEmpty();
 }

@@ -5,14 +5,10 @@ import com.rtumirea.KazakovIG.cursework.domain.entities.ServiceEntity;
 import com.rtumirea.KazakovIG.cursework.domain.enums.ServiceType;
 import com.rtumirea.KazakovIG.cursework.mappers.Mapper;
 import com.rtumirea.KazakovIG.cursework.services.ServiceService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +36,7 @@ public class ClientServiceController {
         model.addAttribute("servicesByType", servicesByType);
         Map<String, String> serviceTypeNames = getServiceTypeNames();
         model.addAttribute("serviceTypeNames", serviceTypeNames);
-        return "client_services";
+        return "client/client_services";
     }
 
     public Map<String, String> getServiceTypeNames() {
